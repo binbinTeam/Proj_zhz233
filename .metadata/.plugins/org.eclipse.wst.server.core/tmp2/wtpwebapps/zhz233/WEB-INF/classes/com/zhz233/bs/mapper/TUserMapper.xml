@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhz233.bs.idao.TUserIDAO">
+	<!-- resultMap 实体映射-->
+	<resultMap type="com.zhz233.bs.model.TUserModel" id="TUser">
+	    <id property="id" column="id"/>
+	    <result property="account_no" column="account_no"/>
+	    <result property="account" column="account"/>
+	    <result property="cell_phone" column="cell_phone"/>
+	    <result property="password" column="password"/>
+	    <result property="update_time" column="update_time"/>
+	    <result property="create_time" column="create_time"/>
+	    <result property="access" column="access"/>
+	</resultMap>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAuto">  
+		SELECT id,account_no,account,cell_phone,password,update_time,create_time,access
+		FROM tab_user
+	</sql>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAutoByAC">  
+		SELECT account_no
+		FROM tab_user
+	</sql>
+	<!-- 增加一条用户数据 -->
+	<insert id="insert" parameterType="com.zhz233.bs.model.TUserModel">
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+			insert into tab_user(account_no,account,cell_phone,password,update_time,create_time,access)
+			values(#{account_no},#{account},#{cell_phone},#{password},#{update_time},#{create_time},#{access})
+	</insert>
+	<!-- 删除一条用户数据 -->
+	<delete id="delete" parameterType="com.zhz233.bs.model.TUserModel">
+		DELETE FROM Tab_User
+	    <where>
+	        <if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="account != null">
+	            and account = #{account}
+	        </if>
+	        <if test="cell_phone != null">
+	            and cell_phone = #{cell_phone}
+	        </if>
+	        <if test="password != null">
+	            and password = #{password}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	        <if test="access != null">
+	            and access = #{access}
+	        </if>
+	    </where>
+	</delete>
+	<!-- 更新一条数据 -->
+	<update id="update" parameterType="com.zhz233.bs.model.TUserModel">
+	    UPDATE Tab_User
+	    <set>
+	        <if test="account_no != null">
+	            account_no = #{account_no}
+	        </if>
+	        <if test="account != null">
+	            account = #{account}
+	        </if>
+	        <if test="cell_phone != null">
+	            cell_phone = #{cell_phone}
+	        </if>
+	        <if test="password != null">
+	            password = #{password}
+	        </if>
+	        <if test="update_time != null">
+	            update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            create_time = #{create_time}
+	        </if>
+	        <if test="access != null">
+	            access = #{access}
+	        </if>
+	    </set>
+	    <where>
+	    	<if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="account != null">
+	            and account = #{account}
+	        </if>
+	        <if test="cell_phone != null">
+	            and cell_phone = #{cell_phone}
+	        </if>
+	        <if test="password != null">
+	            and password = #{password}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	        <if test="access != null">
+	            and access = #{access}
+	        </if>
+	    </where>
+	</update>
+	<!-- 精确 查询自增No -->
+	<select id="selectN" resultType="java.lang.String">
+		SELECT account_no
+		FROM Tab_User
+		ORDER BY create_time DESC 
+		LIMIT 1
+	</select>
+	<!-- 验证用户名 密码 -->
+	<select id="selectByAC" parameterType="com.zhz233.bs.model.TUserModel" resultType="java.lang.String">
+		<include refid="selectAutoByAC"/>
+		<where>
+	        <if test="account != null">
+	            and account = #{account}
+	        </if>
+	        <if test="cell_phone != null">
+	            and cell_phone = #{cell_phone}
+	        </if>
+	    </where>
+		LIMIT 1
+	</select>
+	<!-- 验证用户名 密码 -->
+	<select id="selectByAccPwd" parameterType="com.zhz233.bs.model.TUserModel" resultType="com.zhz233.bs.model.TUserModel">
+		<include refid="selectAuto"/>
+		<where>
+	        <if test="account != null">
+	            and account = #{account}
+	        </if>
+	        <if test="password != null">
+	            and password = #{password}
+	        </if>
+	    </where>
+		LIMIT 1
+	</select>
+	<!-- 精确 查询一条记录 -->
+	<select id="selectByAccPho" parameterType="com.zhz233.bs.model.TUserModel" resultType="com.zhz233.bs.model.TUserModel">
+		<include refid="selectAuto"/>
+		<where>
+	        <if test="account != null">
+	            and account = #{account}
+	        </if>
+	        <if test="cell_phone != null">
+	            and cell_phone = #{cell_phone}
+	        </if>
+	    </where>
+		LIMIT 1
+	</select>
+	<!-- 精确 查询一条记录 -->
+	<select id="selectT" parameterType="com.zhz233.bs.model.TUserModel" resultType="com.zhz233.bs.model.TUserModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="account != null">
+	            and account = #{account}
+	        </if>
+	        <if test="cell_phone != null">
+	            and cell_phone = #{cell_phone}
+	        </if>
+	        <if test="password != null">
+	            and password = #{password}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	        <if test="access != null">
+	            and access = #{access}
+	        </if>
+	    </where>
+		LIMIT 1
+	</select>
+	<!-- 精确 查询记录集合 -->
+	<select id="selectListT" parameterType="com.zhz233.bs.model.TUserModel" resultType="com.zhz233.bs.model.TUserModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="account != null">
+	            and account = #{account}
+	        </if>
+	        <if test="cell_phone != null">
+	            and cell_phone = #{cell_phone}
+	        </if>
+	        <if test="password != null">
+	            and password = #{password}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	        <if test="access != null">
+	            and access = #{access}
+	        </if>
+	    </where>
+	</select>
+	<!-- 精确  时间段 查询记录集合 -->
+	<select id="selectTimeListT" resultType="com.zhz233.bs.model.TUserModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="beginDate != null">
+				AND update_time <![CDATA[>=]]> #{beginDate}
+			</if>
+ 			<if test="endDate != null">
+ 				AND update_time <![CDATA[<=]]>#{endDate}
+ 			</if>
+	    </where>
+	</select>
+	<!-- 查询所有记录集合 -->
+	<select id="select" resultType="com.zhz233.bs.model.TUserModel">
+		<include refid="selectAuto"/>
+	</select>
+	<!-- 模糊 查询记录集合 -->
+	<select id="selectBlurListT" parameterType="com.zhz233.bs.model.TUserModel" resultType="com.zhz233.bs.model.TUserModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="account_no != null">
+	            or account_no like CONCAT('%',#{account_no},'%')
+	        </if>
+	        <if test="account != null">
+	            or account like CONCAT('%',#{account},'%')
+	        </if>
+	        <if test="cell_phone != null">
+	            or cell_phone like CONCAT('%',#{cell_phone},'%')
+	        </if>
+	        <if test="password != null">
+	            or password like CONCAT('%',#{password},'%')
+	        </if>
+	        <if test="update_time != null">
+	            or update_time like CONCAT('%',#{update_time},'%')
+	        </if>
+	        <if test="create_time != null">
+	            or create_time like CONCAT('%',#{create_time},'%')
+	        </if>
+	        <if test="access != null">
+	            or access like CONCAT('%',#{access},'%')
+	        </if>
+	    </where>
+	</select>
+</mapper>	

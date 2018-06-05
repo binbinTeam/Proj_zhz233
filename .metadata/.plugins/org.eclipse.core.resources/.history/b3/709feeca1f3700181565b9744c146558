@@ -1,0 +1,76 @@
+/**
+* Copyright © 2018 ZhzTeam Info. All rights reserved.
+*  
+* @Title: TGameModel.java 
+* @Package com.zhz233.bs.model 
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年4月2日
+* @version V1.0.0
+*/
+package com.zhz233.bs.model;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+* @ClassName: TGameModel
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年4月2日
+*/
+public class TGameModel implements Serializable{
+
+	/**
+	* @Fields serialVersionUID : TODO 
+	*/
+	private static final long serialVersionUID = 1L;
+	//tab_gamename
+	//
+	private long id;//id
+	private String game_no;//游戏id
+	private String game_name;//游戏名称
+	private String game_type;//游戏类型
+	private String game_recomm;//游戏推荐热度
+	private Date create_time;//创建时间
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public String getGame_no() {
+		return game_no;
+	}
+	public void setGame_no(String game_no) {
+		this.game_no = game_no;
+	}
+	public String getGame_name() {
+		return game_name;
+	}
+	public void setGame_name(String game_name) {
+		this.game_name = game_name;
+	}
+	public String getGame_type() {
+		return game_type;
+	}
+	public void setGame_type(String game_type) {
+		this.game_type = game_type;
+	}
+	public String getGame_recomm() {
+		return game_recomm;
+	}
+	public void setGame_recomm(String game_recomm) {
+		this.game_recomm = game_recomm;
+	}
+	public Date getCreate_time() {
+		return create_time;
+	}
+	public void setCreate_time(Date create_time) {
+		this.create_time = create_time;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+}

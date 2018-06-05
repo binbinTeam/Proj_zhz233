@@ -1,0 +1,4 @@
+#Tomcat publish data
+#Sat May 19 17:21:17 CST 2018
+org.eclipse.jst.jee.server\:/binary\:G\:\\JAVA\\Proj_zhz233\\zhz233\\WebContent\\WEB-INF\\lib\\log4j-web-2.10.0.jar=WEB-INF/lib/log4j-web-2.10.0.jar
+org.eclipse.jst.jee.server\:/binary\:G\:\\JAVA\\Proj_zhz233\\zhz233\\WebContent\\WEB-INF\\lib\\spring-web-5.0.3.RELEASE.jar=WEB-INF/lib/spring-web-5.0.3.RELEASE.jar

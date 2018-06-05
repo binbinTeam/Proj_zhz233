@@ -1,0 +1,55 @@
+$(document).ready(function() {
+	ShowInvlaInfo();
+});
+/**
+ * id 集合
+ */
+var psonl_content = $("#psonl_content");
+/**
+ * 获取资金信息
+ * @returns
+ */
+function ShowInvlaInfo(){
+	var PaginationModel = {//数据集合
+			current_page: 0,
+			page_count: 5
+	}
+	$.ajax({
+		url: "dbfo/ShowInvlaInfo",//要请求的服务器url
+        data: JSON.stringify(PaginationModel),  //参数
+        async: true,   //是否为异步请求
+        cache: false,  //是否缓存结果
+        type: "POST", //请求方式为POST
+        contentType: "application/json",
+        dataType: "json",   //服务器返回的数据是什么类型
+        beforeSend: function(request) { 
+        },
+        success: function (data) {
+        	var json = eval(data);
+            var res = json.result;
+            var ires = json.iResult;
+            if(res.code == 1022 && ires.code == 1024){//数据获取成功
+            	var reMap = ires.reMap;
+            	$.each(reMap,function(i,item){
+            		if(i == "data_list"){
+                    	var reList = reMap.data_list;
+            			$.each(reList,function(i,item){
+            				$.each(item,function(i,item){
+	            				if(i == "create_time"){
+	            					var temp = dateFormat("Y-m-d H:i:s",item);  
+	            	            	console.log(temp);
+	            				}
+	            				if(i == "update_time"){
+	            					var temp = dateFormat("Y-m-d H:i:s",item);  
+	            	            	console.log(temp);
+	            				}
+            				});
+            			});
+            		}
+            	});
+            }
+        },
+        error: function () {
+        }
+	});
+}

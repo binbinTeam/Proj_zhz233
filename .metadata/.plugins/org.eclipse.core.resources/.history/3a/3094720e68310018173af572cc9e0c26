@@ -1,0 +1,380 @@
+/**
+* Copyright © 2018 ZhzTeam Info. All rights reserved.
+*  
+* @Title: LogonOfController.java 
+* @Package com.zhz233.bs.controller 
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月18日
+* @version V1.0.0
+*/
+package com.zhz233.bs.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.zhz233.bs.model.JWTModel;
+import com.zhz233.bs.model.TUserModel;
+import com.zhz233.bs.result.CodeResult;
+import com.zhz233.bs.result.JWTResult;
+import com.zhz233.bs.result.ZHZResult;
+import com.zhz233.bs.service.impl.TUserServiceImpl;
+import com.zhz233.comn.config.JWTConfig;
+import com.zhz233.comn.config.RedisConfig;
+import com.zhz233.comn.config.ZHZConfig;
+import com.zhz233.comn.utils.JWTUtils;
+import com.zhz233.comn.utils.REVUtils;
+import com.zhz233.comn.utils.RedisUtils;
+import com.zhz233.comn.utils.SMSUtils;
+import com.zhz233.comn.utils.TimeUtils;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.exceptions.JedisException;
+
+/**
+* @ClassName: LogonOfController
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月18日
+*/
+@Controller
+@RequestMapping("/ls")//游客控制层
+@Scope("prototype")
+public class LogonOfController {
+	
+	/**
+	 * 定义全局变量
+	 */
+	private JWTResult jwtResult;
+	private JWTModel jwtModel;
+	private TUserModel tUserModel;
+	private Jedis jedis;
+	private String claims;
+	private String token;
+	private String tokenStr;
+	private Map<String, Object> map;
+	private ZHZResult zhzResult;
+	private HttpSession hSession;
+	private String ssid;
+	private boolean tempFlag;
+	private ModelAndView modelAndView;
+	private String code;
+	private CodeResult codeResult;
+	@Resource
+	private TUserServiceImpl tUserServiceImpl;
+	
+	/**
+	 * 
+	* @Title: sigin
+	* @Description: TODO 
+	* @return 
+	* ModelAndView  
+	* @throws
+	 */
+	@RequestMapping(value="/sigin", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> sigin(HttpServletRequest hsRequest,
+			@RequestParam("uacc") String acc,
+			@RequestParam("upwd") String pwd){
+		//初始化对象
+		map = new HashMap<String,Object>();
+		hSession = hsRequest.getSession();
+		ssid = (String) hSession.getId();
+		zhzResult = new ZHZResult();
+		boolean tempFlag = false;
+		//判断登录状态
+		try {
+			jedis = RedisUtils.getJedis();
+			if(jedis.exists(ssid) && jedis.exists(jedis.get(ssid))) {
+				tempFlag = true;
+			}
+			jedis.close();
+		}catch (JedisException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		if(tempFlag) {//返回信息 返回104
+			zhzResult.setCode(ZHZConfig.LOGINREQCODE_AGAIN);
+			zhzResult.setMsg("用户已登录！");
+			////////////////
+			//处理 同一ip 不同 用户登录
+		}else {
+			//判断字段
+			if(acc != null && pwd != null) {
+				//判断格式
+				if(REVUtils.isAccount8_abc(acc) && REVUtils.isPwd6_abc(pwd)) {
+					tUserModel = new TUserModel();
+					tUserModel.setAccount(acc);
+					tUserModel.setPassword(pwd);
+					//判断数据库 数据正确性
+					if(tUserServiceImpl.selectByKey(tUserModel)) {
+						try {
+							jedis = RedisUtils.getJedis();
+							if(jedis.exists(acc) && jedis.exists(jedis.get(acc))) {
+								//关闭上一个会话登录状态
+								jedis.del(jedis.get(acc));
+								jedis.del(acc);
+							}
+							//添加登录状态 
+							jedis.set(acc, ssid);
+							jedis.expire(acc, RedisConfig.REDIS_TIMEOUT_30MIN);
+							jedis.set(ssid, acc);
+							jedis.expire(ssid, RedisConfig.REDIS_TIMEOUT_30MIN);
+							jedis.close();
+						}catch (JedisException e) {
+							// TODO: handle exception
+							e.printStackTrace();
+						}
+						//签发token
+						token = JWTUtils.createJWT(
+								JWTConfig.JWT_ADMIN_ROBOT,
+								JWTConfig.JWT_AUDD_TOURIST, 
+								acc, 
+								TimeUtils.getDate(), 
+								JWTConfig.JWT_TTL_30MIN);
+						map.put("token", token);
+						//返回信息 返回100
+						zhzResult.setCode(ZHZConfig.LOGINREQCODE_SUCCESS);
+						zhzResult.setMsg("用户登录成功！");
+					}else {//密码或账户错误 返回101
+						zhzResult.setCode(ZHZConfig.LOGINREQCODE_FAIL);
+						zhzResult.setMsg("用户密码或账户错误！");
+					}
+				}else {//格式错误 返回102
+					zhzResult.setCode(ZHZConfig.LOGINREQCODE_STYLEFAIL);
+					zhzResult.setMsg("用户密码或账户格式错误！");
+				}
+			}else {//格式错误 返回103
+				zhzResult.setCode(ZHZConfig.LOGINREQCODE_ERROR);
+				zhzResult.setMsg("登录异常！");
+			}
+		}
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("result", zhzResult);
+		//返回请求结果map
+		return map;
+	}
+	/**
+	 * 
+	* @Title: sigout
+	* @Description: TODO 
+	* @return 
+	* ModelAndView  
+	* @throws
+	 */
+	@RequestMapping("/sigout")
+	@ResponseBody
+	public ModelAndView sigout(HttpServletRequest hsRequest) {
+		//获取页面对象
+		modelAndView = new ModelAndView();
+		hSession = hsRequest.getSession();
+		ssid = (String) hSession.getId();
+		try {
+			jedis = RedisUtils.getJedis();
+			if(jedis.exists(ssid) && jedis.exists(jedis.get(ssid))) {
+				//关闭会话登录状态
+				jedis.del(jedis.get(ssid));
+				jedis.del(ssid);
+			}
+			jedis.close();
+		}catch (JedisException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		//设置视图
+		modelAndView.setViewName("bs/home/index_home");
+		//返回视图
+		return modelAndView;
+	}
+	@RequestMapping(value="/checkcode", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> checkcode(HttpServletRequest hsRequest,
+			@RequestParam("ucode") String cd,
+			@RequestParam("uphone") String pho){
+		if(cd != null && pho !=null) {
+			pho = "pho_"+pho;
+			if(REVUtils.isCode_6(cd)) {
+				String temp = null;
+				//判断登录状态
+				try {
+					jedis = RedisUtils.getJedis();
+					if(jedis.exists(pho)) {
+						temp = jedis.get(pho);
+					}
+					jedis.close();
+				}catch (JedisException e) {
+					// TODO: handle exception
+					e.printStackTrace();
+				}
+				if(temp.toUpperCase() == cd.toUpperCase()) {
+					zhzResult.setCode(ZHZConfig.DATEREQCODE_SUCCESS);
+					zhzResult.setMsg("验证成功！");
+				}else {
+					zhzResult.setCode(ZHZConfig.DATEREQCODE_FAIL);
+					zhzResult.setMsg("验证失败！");
+				}
+			}else{//302
+				zhzResult.setCode(ZHZConfig.DATEREQCODE_FAIL);
+				zhzResult.setMsg("验证失败！");
+			}
+		}else {//302
+			zhzResult.setCode(ZHZConfig.DATEREQCODE_FAIL);
+			zhzResult.setMsg("验证失败！");
+		}
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("result", zhzResult);
+		return map;
+	}
+	/**
+	 * 
+	* @Title: getcode
+	* @Description: TODO 
+	* @param hsRequest
+	* @param tUser
+	* @return 
+	* Map<String,Object>  
+	* @throws
+	 */
+	@RequestMapping(value="/getcode", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> getcode(HttpServletRequest hsRequest,
+			@RequestParam("uphone") String pho){
+		//初始化对象
+		map = new HashMap<String,Object>();
+		hSession = hsRequest.getSession();
+		zhzResult = new ZHZResult();
+		boolean tempFlag = false;
+		if(pho != null) {
+			//判断登录状态
+			try {
+				jedis = RedisUtils.getJedis();
+				if(jedis.exists(pho)) {
+					tempFlag = true;
+				}
+				jedis.close();
+			}catch (JedisException e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+		}
+		if(tempFlag) {//注册验证码 已发送//301
+			zhzResult.setCode(ZHZConfig.DATEREQCODE_AGAIN);
+			zhzResult.setMsg("已经获取！");
+		}else {//300
+			//返回验证码
+			codeResult = SMSUtils.cerateMsg(6);
+			SMSUtils.execute(pho, codeResult.getMsg());
+			code = codeResult.getCode();
+			try {
+				jedis = RedisUtils.getJedis();
+				if(!jedis.exists(pho)) {
+					jedis.set(pho, code);
+					jedis.expire(pho, RedisConfig.REDIS_TIMEOUT_30MIN);
+				}
+				jedis.close();	
+			}
+			catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}	
+			zhzResult.setCode(ZHZConfig.DATEREQCODE_SUCCESS);
+			zhzResult.setMsg("获取成功！");
+//			map.put("code", code);
+		}
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("result", zhzResult);
+		//返回请求结果map
+		return map;
+	}
+	/**
+	 * 
+	* @Title: regist
+	* @Description: TODO 
+	* @param hsRequest
+	* @param tUser
+	* @return 
+	* Map<String,Object>  
+	* @throws
+	 */
+	@RequestMapping(value="/regist", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> regist(HttpServletRequest hsRequest,
+			@RequestBody TUserModel tUser){
+		//初始化对象
+		map = new HashMap<String,Object>();
+		hSession = hsRequest.getSession();
+		ssid = (String) hSession.getId();
+		zhzResult = new ZHZResult();
+		boolean tempFlag = false;
+		//判断登录状态
+		try {
+			jedis = RedisUtils.getJedis();
+			if(jedis.exists(ssid) && jedis.exists(jedis.get(ssid))) {
+				tempFlag = true;
+			}
+			jedis.close();
+		}catch (JedisException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		if(tempFlag) {//注册异常 返回205
+			zhzResult.setCode(ZHZConfig.REGISTERREQCODE_ERROR);
+			zhzResult.setMsg("用户已登录！请退出后注册新的账号！");
+			////////////////
+			//处理 同一ip 不同 用户注册
+		}else {
+			//判断字段
+			if(tUser.getAccount() != null 
+					&& tUser.getCell_phone() != null
+					&& tUser.getPassword() != null) {
+				//用户名 检查
+				//手机号 检查
+				//密码 检查
+				if(REVUtils.isAccount8_abc(tUser.getAccount()) 
+						&& REVUtils.isSimplePhone(tUser.getCell_phone())
+						&& REVUtils.isPwd6_abc(tUser.getPassword())) {
+					tUserModel = new TUserModel();
+					tUserModel.setAccount(tUser.getAccount());
+					tUserModel.setCell_phone(tUser.getCell_phone());
+					tUserModel.setPassword(tUser.getPassword());
+					//验证用户名唯一
+					if(!tUserServiceImpl.selectByKey(tUserModel)) {
+						//注册信息
+						if(tUserServiceImpl.insertByKey(tUserModel)) {
+							zhzResult.setCode(ZHZConfig.REGISTERREQCODE_SUCCESS);
+							zhzResult.setMsg("注册成功！");
+						}else {
+							zhzResult.setCode(ZHZConfig.REGISTERREQCODE_FAIL);
+							zhzResult.setMsg("注册失败！");
+						}
+					}else {//202
+						zhzResult.setCode(ZHZConfig.REGISTERREQCODE_AGAIN);
+						zhzResult.setMsg("该用户名已被注册！");
+					}
+				}else {//203
+					zhzResult.setCode(ZHZConfig.REGISTERREQCODE_STYLEFAIL);
+					zhzResult.setMsg("注册信息格式异常！");
+				}
+			}else {//204
+				zhzResult.setCode(ZHZConfig.REGISTERREQCODE_ERROR);
+				zhzResult.setMsg("注册信息异常！");
+			}
+		}
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("result", zhzResult);
+		//返回请求结果map
+		return map;
+	}
+}

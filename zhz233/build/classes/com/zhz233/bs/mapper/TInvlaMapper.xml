@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhz233.bs.idao.TInvlaIDAO">
+	<!-- resultMap 实体映射-->
+	<resultMap type="com.zhz233.bs.model.TInvlaModel" id="TInvla">
+	    <id property="id" column="id"/>
+	    <result property="order_no" column="order_no"/>
+	    <result property="account_no" column="account_no"/>
+	    <result property="order_operate_type" column="order_operate_type"/>
+	    <result property="order_amount" column="order_amount"/>
+	    <result property="update_time" column="update_time"/>
+	    <result property="create_time" column="create_time"/>
+	</resultMap>
+	<!-- resultMap View实体映射-->
+	<resultMap type="com.zhz233.bs.model.VInvlaModel" id="VInvla">
+	    <result property="sum" column="sum"/>
+	    <result property="count" column="count"/>
+	</resultMap>
+	<!-- parameterMap -->
+	<parameterMap type="com.zhz233.bs.model.TInvlaModel" id="TInvlaModel">
+		<parameter property="id"/>
+	    <parameter property="order_no"/>
+	    <parameter property="account_no"/>
+	    <parameter property="order_operate_type"/>
+	    <parameter property="order_amount"/>
+	    <parameter property="update_time"/>
+	    <parameter property="create_time"/>
+	</parameterMap>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAuto">  
+		SELECT id,order_no,account_no,order_operate_type,order_amount,update_time,create_time
+		FROM Tab_Invla
+	</sql>
+	<!-- 复用sql语句  查询表合成字段 -->
+	<sql id="selectSC">
+		SELECT COALESCE(SUM(order_amount),0) AS sum,count(id) AS count
+		FROM Tab_Invla
+	</sql>
+	<!-- 增加一条用户数据 -->
+	<insert id="insert" parameterType="com.zhz233.bs.model.TInvlaModel">
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+			insert into Tab_Invla(order_no,account_no,order_operate_type,order_amount,
+			update_time,create_time)
+			values(#{order_no},#{account_no},#{order_operate_type},#{order_amount},
+			NOW(),NOW())
+	</insert>
+	<!-- 删除一条用户数据 -->
+	<delete id="delete" parameterType="com.zhz233.bs.model.TInvlaModel">
+		DELETE FROM Tab_Invla
+	    <where>
+	        <if test="order_no != null">
+	            and order_no = #{order_no}
+	        </if>
+	    </where>
+	</delete>
+	<!-- 更新一条数据 -->
+	<update id="update" parameterType="com.zhz233.bs.model.TInvlaModel">
+	    UPDATE Tab_Invla
+	    <set>
+	        <if test="order_no != null">
+	            order_no = #{order_no}
+	        </if>
+	        <if test="account_no != null">
+	            account_no = #{account_no}
+	        </if>
+	        <if test="order_operate_type != null">
+	            order_operate_type = #{order_operate_type}
+	        </if>
+	        <if test="order_amount != null">
+	            order_amount = #{order_amount}
+	        </if>
+	        <if test="update_time != null">
+	            update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            create_time = #{create_time}
+	        </if>
+	    </set>
+	    <where>
+	    	<if test="order_no != null">
+	            and order_no = #{order_no}
+	        </if>
+	    </where>
+	</update>
+	<!-- 条件查询返回no -->
+	<select id="selectN" resultType="java.lang.String">
+		SELECT order_no 
+		FROM Tab_Invla
+		ORDER BY create_time DESC 
+		LIMIT 1
+	</select>
+	<!-- selectPaginationListT 分页查询记录 -->
+	<select id="selectPaginationListT" resultMap="TInvla">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="tModel.order_no != null">
+	            and order_no = #{tModel.order_no}
+	        </if>
+	        <if test="tModel.account_no != null">
+	            and account_no = #{tModel.account_no}
+	        </if>
+	        <if test="tModel.order_operate_type != null">
+	            and order_operate_type = #{tModel.order_operate_type}
+	        </if>
+	        <if test="tModel.order_amount != null">
+	            and order_amount = #{tModel.order_amount}
+	        </if>
+	        <if test="pModel.start_time != null ">
+	            and update_time <![CDATA[>=]]> #{pModel.start_time}
+	        </if>
+	        <if test="pModel.end_time != null ">
+	            and update_time <![CDATA[<=]]> #{pModel.end_time}
+	        </if>
+		</where>
+		ORDER BY update_time DESC
+		<if test="pModel.startPage != null and pModel.pageSize != null">  
+        	LIMIT #{pModel.startPage},#{pModel.pageSize}
+    	</if>
+	</select> 
+	<!-- selectPagination 精确 查询记录 -->
+	<select id="selectPagination" resultMap="TInvla">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="tModel.order_no != null">
+	            and order_no = #{tModel.order_no}
+	        </if>
+			<if test="tModel.account_no != null">
+	            and account_no = #{tModel.account_no}
+	        </if>
+	        <if test="tModel.order_operate_type != null">
+	            and order_operate_type = #{tModel.order_operate_type}
+	        </if>
+		</where>
+		<if test="startPage != null and pageSize != null">  
+        	LIMIT #{startPage},#{pageSize}
+    	</if> 
+	</select> 
+	<!-- selectSumCountByANOT 精确 查询一条记录 -->
+	<select id="selectSumCountByANOT" parameterType="com.zhz233.bs.model.TInvlaModel" resultMap="VInvla">
+		<include refid="selectSC"/>
+		<where>
+			<if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="order_operate_type != null">
+	            and order_operate_type = #{order_operate_type}
+	        </if>
+		</where>
+		LIMIT 1
+	</select> 
+	<!-- 精确 查询一条记录 -->
+	<select id="selectT" parameterType="com.zhz233.bs.model.TInvlaModel" resultType="com.zhz233.bs.model.TInvlaModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="order_no != null">
+	            and order_no = #{order_no}
+	        </if>
+	        <if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="order_operate_type != null">
+	            and order_operate_type = #{order_operate_type}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	    </where>
+		LIMIT 1
+	</select>
+	<!-- 精确 查询记录集合 -->
+	<select id="selectListT" parameterType="com.zhz233.bs.model.TInvlaModel" resultType="com.zhz233.bs.model.TInvlaModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="order_no != null">
+	            and order_no = #{order_no}
+	        </if>
+	        <if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="order_operate_type != null">
+	            and order_operate_type = #{order_operate_type}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	    </where>
+	</select>
+	<!-- 精确  时间段 查询记录集合 -->
+	<select id="selectTimeListT" resultType="com.zhz233.bs.model.TInvlaModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="beginDate != null">
+				AND update_time <![CDATA[>=]]> #{beginDate}
+			</if>
+ 			<if test="endDate != null">
+ 				AND update_time <![CDATA[<=]]>#{endDate}
+ 			</if>
+	    </where>
+	</select>
+	<!-- 查询所有记录集合 -->
+	<select id="select" resultType="com.zhz233.bs.model.TInvlaModel">
+		<include refid="selectAuto"/>
+	</select>
+	<!-- 模糊 查询记录集合 -->
+	<select id="selectBlurListT"  parameterType="com.zhz233.bs.model.TInvlaModel" resultType="com.zhz233.bs.model.TInvlaModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="order_no != null">
+	            or order_no like CONCAT('%',#{order_no},'%')
+	        </if>
+	        <if test="account_no != null">
+	            or account_no like CONCAT('%',#{account_no},'%')
+	        </if>
+	        <if test="order_operate_type != null">
+	            or order_operate_type like CONCAT('%',#{order_operate_type},'%')
+	        </if>
+	        <if test="update_time != null">
+	            or update_time like CONCAT('%',#{update_time},'%')
+	        </if>
+	        <if test="create_time != null">
+	            or create_time like CONCAT('%',#{create_time},'%')
+	        </if>
+	    </where>
+	</select>
+</mapper>	

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhz233.bs.idao.TNoticeIDAO">
+	<!-- resultMap 实体映射-->
+	<resultMap type="com.zhz233.bs.model.TNoticeModel" id="TNotice">
+	    <id property="id" column="id"/>
+	    <result property="notice_no" column="notice_no"/>
+	    <result property="notice_type" column="notice_type"/>
+	    <result property="notice_theme" column="notice_theme"/>
+	    <result property="notice_content" column="notice_content"/>
+	    <result property="update_time" column="update_time"/>
+	    <result property="create_time" column="create_time"/>
+	    <result property="notice_viewcount" column="notice_viewcount"/>
+	</resultMap>
+	<!-- resultMap View实体映射-->
+	<resultMap type="com.zhz233.bs.model.VNoticeModel" id="VNoticeT5ByNT">
+	    <result property="notice_no" column="notice_no"/>
+	    <result property="notice_theme" column="notice_theme"/>
+	    <result property="notice_viewcount" column="notice_viewcount"/>
+	</resultMap>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAuto">  
+		SELECT id,notice_no,notice_type,notice_theme,notice_content,update_time,create_time,notice_viewcount
+		FROM Tab_Notice
+	</sql>
+	<!-- 复用sql语句  查询表部分字段 -->
+	<sql id="selectAutoTop5">
+		SELECT notice_no,notice_theme,notice_viewcount
+		FROM View_Notice
+	</sql>	
+	<!-- 增加一条用户数据 -->
+	<insert id="insert" parameterType="com.zhz233.bs.model.TNoticeModel">
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+			insert into Tab_Notice(notice_no,notice_type,notice_theme,notice_content,update_time,create_time,notice_viewcount)
+			values(#{notice_no},#{notice_type},#{notice_theme},#{notice_content},NOW(),NOW(),#{notice_viewcount})
+	</insert>
+	<!-- 删除一条用户数据 -->
+	<delete id="delete" parameterType="com.zhz233.bs.model.TNoticeModel">
+		DELETE FROM Tab_Notice
+	    <where>
+	    	<if test="notice_no != null">
+	            and notice_no = #{notice_no}
+	        </if>
+	        <if test="notice_theme != null">
+	            and notice_theme = #{notice_theme}
+	        </if>
+	    </where>
+	</delete>
+	<!-- 条件查询返回id总数 -->
+	<select id="select" parameterType="com.zhz233.bs.model.TNoticeModel" resultType="java.lang.Long">
+		SELECT count(id) FROM Tab_Notice
+		<where>
+			<if test="notice_no != null">
+	            and notice_no = #{notice_no}
+	        </if>
+	        <if test="notice_theme != null">
+	            and notice_theme = #{notice_theme}
+	        </if>
+	    </where>
+	</select>
+	<!-- 获取5条数据 -->
+	<select id="selectTop5ByNT" parameterType="java.lang.Integer" resultMap="VNoticeT5ByNT">
+		<include refid="selectAutoTop5"/>
+		<where>
+			<if test="notice_type != null">
+	            and notice_type = #{notice_type}
+	        </if>
+		</where>
+		LIMIT 5
+	</select>
+	<!-- 精确 条件查询 返回一条数据 -->
+	<select id="selectT" parameterType="com.zhz233.bs.model.TNoticeModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="notice_no != null">
+	            and notice_no = #{notice_no}
+	        </if>
+	        <if test="notice_type != null">
+	            and notice_type = #{notice_type}
+	        </if>
+	        <if test="notice_theme != null">
+	            and notice_theme = #{notice_theme}
+	        </if>
+	        <if test="notice_content != null">
+	            and notice_content = #{notice_content}
+	        </if>
+	        <if test="notice_viewcount != null">
+	            and notice_viewcount = #{notice_viewcount}
+	        </if>
+	    </where>
+	    LIMIT 1
+	</select>
+	<!-- 精确 条件查询 返回数据集合 -->
+	<select id="selectListT" parameterType="com.zhz233.bs.model.TNoticeModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="notice_no != null">
+	            and notice_no = #{notice_no}
+	        </if>
+	        <if test="notice_type != null">
+	            and notice_type = #{notice_type}
+	        </if>
+	        <if test="notice_theme != null">
+	            and notice_theme = #{notice_theme}
+	        </if>
+	        <if test="notice_content != null">
+	            and notice_content = #{notice_content}
+	        </if>
+	        <if test="notice_viewcount != null">
+	            and notice_viewcount = #{notice_viewcount}
+	        </if>
+	    </where>
+	</select>
+	<!-- update 更新一条数据 -->
+	<update id="update" parameterType="com.zhz233.bs.model.TNoticeModel">
+	    UPDATE Tab_Notice
+	    <set>
+	        <if test="notice_no != null">
+	            notice_no = #{notice_no}
+	        </if>
+	        <if test="notice_type != null">
+	            notice_type = #{notice_type}
+	        </if>
+	        <if test="notice_theme != null">
+	            notice_theme = #{notice_theme}
+	        </if>
+	        <if test="notice_content != null">
+	            notice_content = #{notice_content}
+	        </if>
+	        <if test="update_time != null">
+	            update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            create_time = #{create_time}
+	        </if>
+	        <if test="notice_viewcount != null">
+	            notice_viewcount = #{notice_viewcount}
+	        </if>
+	    </set>
+	    <where>
+	    	<if test="notice_no != null">
+	            and notice_no = #{notice_no}
+	        </if>
+	    </where>
+	</update>
+	<!-- 返回自增No -->
+	<select id="selectN" resultType="java.lang.String">
+		SELECT notice_no 
+		FROM Tab_Notice
+		ORDER BY create_time DESC 
+		LIMIT 1
+	</select>
+</mapper>	

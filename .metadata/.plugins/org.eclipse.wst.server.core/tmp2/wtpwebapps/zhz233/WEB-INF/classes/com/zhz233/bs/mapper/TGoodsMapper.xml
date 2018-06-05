@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhz233.bs.idao.TGoodsIDAO">
+	<!-- resultMap 实体映射-->
+	<resultMap type="com.zhz233.bs.model.TGoodsModel" id="TGoods">
+	    <id property="id" column="id"/>
+	    <result property="goods_no" column="goods_no"/>
+	    <result property="account_no" column="account_no"/>
+	    <result property="goods_type" column="goods_type"/>
+	    <result property="goods_theme" column="goods_theme"/>
+	    <result property="goods_content" column="goods_content"/>
+	    <result property="goods_recomm" column="goods_recomm"/>
+	    <result property="goods_status" column="goods_status"/>
+	    <result property="update_time" column="update_time"/>
+	    <result property="create_time" column="create_time"/>
+	</resultMap>
+	<!-- resultMap 视图实体映射-->
+	<resultMap type="com.zhz233.bs.model.VSpecialGoodsModel" id="VSpecialGoods">
+	 	<result property="goods_no" column="goods_no"/>
+	    <result property="goods_theme" column="goods_theme"/>
+	    <result property="games_name" column="games_name"/>
+	    <result property="goods_hour" column="goods_hour"/>
+	</resultMap>
+	<!-- VGoods -->
+	<resultMap type="com.zhz233.bs.model.VGoodsModel" id="VGoods">
+	 	<result property="goods_no" column="goods_no"/>
+	    <result property="goods_theme" column="goods_theme"/>
+	    <result property="goods_recomm" column="goods_recomm"/>
+	    <result property="games_name" column="games_name"/>
+	    <result property="goods_hour" column="goods_hour"/>
+	    <result property="goods_compensate" column="goods_compensate"/>
+	    <result property="goods_short_time" column="goods_short_time"/>
+	    <result property="goods_credit_level" column="goods_credit_level"/>
+	</resultMap>
+	<sql id="selectTopTen">
+		SELECT goods_no,goods_theme,games_name,goods_hour
+		FROM View_Goods
+	</sql>
+	<!-- VGoods -->
+	<sql id="selectVGoods">
+		SELECT goods_no,goods_theme,goods_recomm,games_name,goods_hour,
+			goods_compensate,goods_short_time,goods_credit_level
+		FROM View_Goods_Rent
+	</sql>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAuto">  
+		SELECT id,goods_no,account_no,goods_type,goods_theme,
+			goods_content,goods_recomm,goods_status,update_time,create_time
+		FROM Tab_Goods
+	</sql>
+	<!-- 复用sql语句  查询表部分字段 -->
+	<!-- 增加一条用户数据 -->
+	<insert id="insert" parameterType="com.zhz233.bs.model.TGoodsModel">
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+			insert 
+			into Tab_Goods(goods_no,account_no,
+			goods_type,goods_theme,goods_content,
+			goods_recomm,goods_status,update_time,create_time)
+			values(#{goods_no},#{account_no},
+			#{goods_type},#{goods_theme},#{goods_content},
+			#{goods_recomm},#{goods_status},NOW(),NOW())
+	</insert>
+	<!-- 删除一条用户数据 -->
+	<delete id="delete" parameterType="com.zhz233.bs.model.TGoodsModel">
+		DELETE FROM Tab_Goods
+	    <where>
+	    	<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	    </where>
+	</delete>
+	<!-- 返回所有数据 -->
+	<select id="select" parameterType="com.zhz233.bs.model.TGoodsModel" resultType="com.zhz233.bs.model.TGoodsModel">
+		<include refid="selectAuto"/>
+	</select>
+	<!-- 精确 查询自增No -->
+	<select id="selectN" resultType="java.lang.String">
+		SELECT goods_no
+		FROM Tab_Goods
+		ORDER BY create_time DESC 
+		LIMIT 1
+	</select>
+	<!-- selectTByGNO -->
+	<select id="selectTByGNO" parameterType="com.zhz233.bs.model.TGoodsModel" resultMap="TGoods">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+		</where>
+	</select>
+	<!-- 精确 条件查询 返回一条数据 -->
+	<select id="selectT" parameterType="com.zhz233.bs.model.TGoodsModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	        <if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="goods_type != null">
+	            and goods_type = #{goods_type}
+	        </if>
+	        <if test="goods_theme != null">
+	            and goods_theme = #{goods_theme}
+	        </if>
+	         <if test="goods_content != null">
+	            and goods_content = #{goods_content}
+	        </if>
+	        <if test="goods_recomm != null">
+	            and goods_recomm = #{goods_recomm}
+	        </if>
+	        <if test="goods_status != null">
+	            and goods_status = #{goods_status}
+	        </if>
+	    </where>
+	</select>
+	<!-- 获取10条数据 -->
+	<select id="selectTop10ByTRS" parameterType="com.zhz233.bs.model.TGoodsModel" resultMap="VSpecialGoods">
+		<include refid="selectTopTen"/>
+		<where>
+	        <if test="goods_recomm != null">
+	            and goods_recomm = #{goods_recomm}
+	        </if>
+	        <if test="goods_status != null">
+	            and goods_status = #{goods_status}
+	        </if>
+	    </where>
+	    LIMIT 10
+	</select>
+	<!-- 商品分页查询多条数据 -->
+	<select id="selectShowListT" parameterType="com.zhz233.bs.model.SearchModel" resultMap="VGoods">
+		<include refid="selectVGoods"/>
+		<where>
+    		<if test="search_type != null">
+	            and games_type = #{search_type}
+	        </if>
+	        <if test="search_game != null">
+	            and games_name like CONCAT('%',#{search_game},'%')
+	        </if>
+	        <if test="search_server != null">
+	            and servers_name like CONCAT('%',#{search_server},'%')
+	        </if>
+	        <if test="search_key != null">
+    			and goods_theme like CONCAT('%',#{search_key},'%')
+    		</if>
+	        <if test="search_price_low != null">  
+        		and goods_hour <![CDATA[>=]]> #{search_price_low}
+    		</if>
+    		<if test="search_price_low != null">  
+        		and goods_hour <![CDATA[<=]]> #{search_price_high}
+    		</if>
+    		<if test="search_auth != null">
+    			and goods_recomm = #{search_auth}
+    		</if>
+		</where>
+		<if test="sortStyle != null and sortStyle == 0">
+			ORDER BY goods_recomm DESC
+    	</if>
+    	<if test="sortStyle != null and sortStyle == 1">
+			ORDER BY goods_credit_level DESC
+    	</if>
+    	<if test="sortStyle != null and sortStyle == 2">
+			ORDER BY goods_hour DESC
+    	</if>
+		<if test="startPage != null and pageSize != null">  
+        	LIMIT #{startPage},#{pageSize}
+    	</if>
+	</select>
+	<!-- 精确 条件查询 返回数据集合 -->
+	<select id="selectListT" parameterType="com.zhz233.bs.model.TGoodsModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	        <if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="goods_type != null">
+	            and goods_type = #{goods_type}
+	        </if>
+	        <if test="goods_theme != null">
+	            and goods_theme = #{goods_theme}
+	        </if>
+	         <if test="goods_content != null">
+	            and goods_content = #{goods_content}
+	        </if>
+	        <if test="goods_recomm != null">
+	            and goods_recomm = #{goods_recomm}
+	        </if>
+	        <if test="goods_status != null">
+	            and goods_status = #{goods_status}
+	        </if>
+	    </where>
+	</select>
+	<!-- update 更新一条数据 -->
+	<update id="update" parameterType="com.zhz233.bs.model.TGoodsModel">
+	    UPDATE Tab_Goods
+	    <set>
+	        <if test="goods_no != null">
+	            goods_no = #{goods_no}
+	        </if>
+	        <if test="account_no != null">
+	            account_no = #{account_no}
+	        </if>
+	        <if test="goods_type != null">
+	            goods_type = #{goods_type}
+	        </if>
+	        <if test="goods_theme != null">
+	            goods_theme = #{goods_theme}
+	        </if>
+	         <if test="goods_content != null">
+	            goods_content = #{goods_content}
+	        </if>
+	        <if test="goods_recomm != null">
+	            goods_recomm = #{goods_recomm}
+	        </if>
+	        <if test="goods_status != null">
+	            goods_status = #{goods_status}
+	        </if>
+	        <if test="update_time != null">
+	            update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            create_time = #{create_time}
+	        </if>
+	    </set>
+	    <where>
+	    	<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	    </where>
+	</update>
+</mapper>	

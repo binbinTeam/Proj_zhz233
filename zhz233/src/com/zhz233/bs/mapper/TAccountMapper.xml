@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhz233.bs.idao.TAccountIDAO">
+	<!-- resultMap 实体映射-->
+	<resultMap type="com.zhz233.bs.model.TAccountModel" id="TAccount">
+	    <id property="id" column="id"/>
+	    <result property="account_no" column="account_no"/>
+	    <result property="certification" column="certification"/>
+	    <result property="available" column="available"/>
+	    <result property="frozen" column="frozen"/>
+	    <result property="credit_level" column="credit_level"/>
+	    <result property="traders_password" column="traders_password"/>
+	    <result property="traders_alipay" column="traders_alipay"/>
+	    <result property="traders_wechat_pay" column="traders_wechat_pay"/>
+	    <result property="update_time" column="update_time"/>
+	    <result property="create_time" column="create_time"/>
+	</resultMap>
+	<!-- resultMap View实体映射-->
+	<resultMap type="com.zhz233.bs.model.VAccountModel" id="TAccountV1">
+	    <result property="account_no" column="account_no"/>
+	    <result property="available" column="available"/>
+	    <result property="frozen" column="frozen"/>
+	</resultMap>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAuto">  
+		SELECT id,account_no,certification,available,frozen,credit_level,traders_password,traders_alipay,traders_wechat_pay,update_time,create_time
+		FROM Tab_Account
+	</sql>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAutoV1">
+		SELECT account_no,available,frozen
+		FROM View_Account
+	</sql>
+	<!-- 增加一条用户数据 -->
+	<insert id="insert" parameterType="com.zhz233.bs.model.TAccountModel">
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+			insert into Tab_Account(account_no,certification,available,frozen,
+			credit_level,traders_password,traders_alipay,traders_wechat_pay,
+			update_time,create_time)
+			values(#{account_no},#{certification},#{available},#{frozen},
+			#{credit_level},#{traders_password},#{traders_alipay},#{traders_wechat_pay},
+			NOW(),NOW())
+	</insert>
+	<!-- 删除一条用户数据 -->
+	<delete id="delete" parameterType="com.zhz233.bs.model.TAccountModel">
+		DELETE FROM Tab_Account
+	    <where>
+	        <if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="certification != null">
+	            and certification = #{certification}
+	        </if>
+	        <if test="available != null">
+	            and available = #{available}
+	        </if>
+	        <if test="frozen != null">
+	            and frozen = #{frozen}
+	        </if>
+	        <if test="credit_level != null">
+	            and credit_level = #{credit_level}
+	        </if>
+	        <if test="traders_password != null">
+	            and traders_password = #{traders_password}
+	        </if>
+	        <if test="traders_alipay != null">
+	            and traders_alipay = #{traders_alipay}
+	        </if>
+	        <if test="traders_wechat_pay != null">
+	            and traders_wechat_pay = #{traders_wechat_pay}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	    </where>
+	</delete>
+	<!-- 更新一条数据 -->
+	<update id="update" parameterType="com.zhz233.bs.model.TAccountModel">
+	    UPDATE Tab_Account
+	    <set>
+	        <if test="account_no != null">
+	            account_no = #{account_no}
+	        </if>
+	        <if test="certification != null">
+	            certification = #{certification}
+	        </if>
+	        <if test="available != null">
+	            available = #{available}
+	        </if>
+	        <if test="frozen != null">
+	            frozen = #{frozen}
+	        </if>
+	        <if test="credit_level != null">
+	            credit_level = #{credit_level}
+	        </if>
+	        <if test="traders_password != null">
+	            traders_password = #{traders_password}
+	        </if>
+	        <if test="traders_alipay != null">
+	            traders_alipay = #{traders_alipay}
+	        </if>
+	        <if test="traders_wechat_pay != null">
+	            traders_wechat_pay = #{traders_wechat_pay}
+	        </if>
+	        <if test="update_time != null">
+	            update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            create_time = #{create_time}
+	        </if>
+	    </set>
+	    <where>
+	    	<if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="certification != null">
+	            and certification = #{certification}
+	        </if>
+	        <if test="available != null">
+	            and available = #{available}
+	        </if>
+	        <if test="frozen != null">
+	            and frozen = #{frozen}
+	        </if>
+	        <if test="credit_level != null">
+	            and credit_level = #{credit_level}
+	        </if>
+	        <if test="traders_password != null">
+	            and traders_password = #{traders_password}
+	        </if>
+	        <if test="traders_alipay != null">
+	            and traders_alipay = #{traders_alipay}
+	        </if>
+	        <if test="traders_wechat_pay != null">
+	            and traders_wechat_pay = #{traders_wechat_pay}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	    </where>
+	</update>
+	<!-- 条件查询返回no -->
+	<select id="selectN" resultType="java.lang.String">
+		SELECT account_no 
+		FROM Tab_Account
+		ORDER BY create_time DESC 
+		LIMIT 1
+	</select>
+	<!-- 获取1条 基础信息 -->
+	<select id="selectByN" parameterType="com.zhz233.bs.model.TAccountModel" resultMap="TAccountV1">
+		<include refid="selectAutoV1"/>
+		<where>
+			<if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+		</where>
+	</select>
+	<!-- 精确 查询一条记录 -->
+	<select id="selectT" parameterType="com.zhz233.bs.model.TAccountModel" resultType="com.zhz233.bs.model.TAccountModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="certification != null">
+	            and certification = #{certification}
+	        </if>
+	        <if test="available != null">
+	            and available = #{available}
+	        </if>
+	        <if test="frozen != null">
+	            and frozen = #{frozen}
+	        </if>
+	        <if test="credit_level != null">
+	            and credit_level = #{credit_level}
+	        </if>
+	        <if test="traders_password != null">
+	            and traders_password = #{traders_password}
+	        </if>
+	        <if test="traders_alipay != null">
+	            and traders_alipay = #{traders_alipay}
+	        </if>
+	        <if test="traders_wechat_pay != null">
+	            and traders_wechat_pay = #{traders_wechat_pay}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	    </where>
+		LIMIT 1
+	</select>
+	<!-- 精确 查询记录集合 -->
+	<select id="selectListT" parameterType="com.zhz233.bs.model.TAccountModel" resultType="com.zhz233.bs.model.TAccountModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="account_no != null">
+	            and account_no = #{account_no}
+	        </if>
+	        <if test="certification != null">
+	            and certification = #{certification}
+	        </if>
+	        <if test="available != null">
+	            and available = #{available}
+	        </if>
+	        <if test="frozen != null">
+	            and frozen = #{frozen}
+	        </if>
+	        <if test="credit_level != null">
+	            and credit_level = #{credit_level}
+	        </if>
+	        <if test="traders_password != null">
+	            and traders_password = #{traders_password}
+	        </if>
+	        <if test="traders_alipay != null">
+	            and traders_alipay = #{traders_alipay}
+	        </if>
+	        <if test="traders_wechat_pay != null">
+	            and traders_wechat_pay = #{traders_wechat_pay}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	    </where>
+	</select>
+	<!-- 精确  时间段 查询记录集合 -->
+	<select id="selectTimeListT" resultType="com.zhz233.bs.model.TAccountModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="beginDate != null">
+				AND update_time <![CDATA[>=]]> #{beginDate}
+			</if>
+ 			<if test="endDate != null">
+ 				AND update_time <![CDATA[<=]]>#{endDate}
+ 			</if>
+	    </where>
+	</select>
+	<!-- 查询所有记录集合 -->
+	<select id="select" resultType="com.zhz233.bs.model.TAccountModel">
+		<include refid="selectAuto"/>
+	</select>
+	<!-- 模糊 查询记录集合 -->
+	<select id="selectBlurListT" parameterType="com.zhz233.bs.model.TAccountModel" resultType="com.zhz233.bs.model.TAccountModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="account_no != null">
+	            or account_no like CONCAT('%',#{account_no},'%')
+	        </if>
+	        <if test="certification != null">
+	            or certification like CONCAT('%',#{certification},'%')
+	        </if>
+	        <if test="available != null">
+	            or available like CONCAT('%',#{available},'%')
+	        </if>
+	        <if test="frozen != null">
+	            or frozen like CONCAT('%',#{frozen},'%')
+	        </if>
+	        <if test="credit_level != null">
+	            or credit_level like CONCAT('%',#{credit_level},'%')
+	        </if>
+	        <if test="traders_password != null">
+	            or traders_password like CONCAT('%',#{traders_password},'%')
+	        </if>
+	        <if test="traders_alipay != null">
+	            or traders_alipay like CONCAT('%',#{traders_alipay},'%')
+	        </if>
+	        <if test="traders_wechat_pay != null">
+	            or traders_wechat_pay like CONCAT('%',#{traders_wechat_pay},'%')
+	        </if>
+	        <if test="update_time != null">
+	            or update_time like CONCAT('%',#{update_time},'%')
+	        </if>
+	        <if test="create_time != null">
+	            or create_time like CONCAT('%',#{create_time},'%')
+	        </if>
+	    </where>
+	</select>
+</mapper>	

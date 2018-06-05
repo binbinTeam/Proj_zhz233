@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhz233.bs.idao.TGamesIDAO">
+	<!-- resultMap 实体映射-->
+	<resultMap type="com.zhz233.bs.model.TGamesModel" id="TGame">
+	    <id property="id" column="id"/>
+	    <result property="games_no" column="games_no"/>
+	    <result property="games_type" column="games_type"/>
+	    <result property="games_name" column="games_name"/>
+	    <result property="games_recomm" column="games_recomm"/>
+	</resultMap>
+	<!-- resultMap 视图实体映射-->
+	<resultMap type="com.zhz233.bs.model.VGamesModel" id="VGameByGT">
+	    <result property="games_no" column="games_no"/>
+	    <result property="games_name" column="games_name"/>
+	    <result property="games_recomm" column="games_recomm"/>
+	</resultMap>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAuto">  
+		SELECT id,games_no,games_type,games_name,games_recomm
+		FROM Tab_Games
+	</sql>
+	<!-- 复用sql语句  查询表部分字段 -->
+	<sql id="selectAutoTop8">  
+		SELECT games_no,games_name,games_recomm
+		FROM View_Games
+	</sql>
+	<!-- 增加一条用户数据 -->
+	<insert id="insert" parameterType="com.zhz233.bs.model.TGamesModel">
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+			insert into Tab_Games(games_no,games_type,games_name,games_recomm)
+			values(#{games_no},#{games_type},#{games_name},#{games_recomm})
+	</insert>
+	<!-- 删除一条用户数据 -->
+	<delete id="delete" parameterType="com.zhz233.bs.model.TGamesModel">
+		DELETE FROM Tab_Games
+	    <where>
+	    	<if test="games_no != null">
+	            and games_no = #{games_no}
+	        </if>
+	        <if test="games_name != null">
+	            and games_name = #{games_name}
+	        </if>
+	    </where>
+	</delete>
+	<!-- 返回所有数据 -->
+	<select id="select" parameterType="com.zhz233.bs.model.TGamesModel" resultType="java.lang.Long">
+		<include refid="selectAuto"/>
+	</select>
+	<!-- 获取 8条数据 -->
+	<select id="selectTop8ByGT" parameterType="com.zhz233.bs.model.TGamesModel" resultMap="VGameByGT">
+		<include refid="selectAutoTop8"/>
+		<where>
+	        <if test="games_type != null">
+	            and games_type = #{games_type}
+	        </if>
+	    </where>
+	    LIMIT 8
+	</select>
+	<!-- 获取 8条数据 -->
+	<select id="selectTop8ByGR" resultMap="VGameByGT">
+		<include refid="selectAutoTop8"/>
+		LIMIT 8
+	</select>
+	<!-- 精确 条件查询 返回一条数据 -->
+	<select id="selectT" parameterType="com.zhz233.bs.model.TGamesModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="games_no != null">
+	            and games_no = #{games_no}
+	        </if>
+	        <if test="games_type != null">
+	            and games_type = #{games_type}
+	        </if>
+	        <if test="games_name != null">
+	            and games_name = #{games_name}
+	        </if>
+	        <if test="games_recomm != null">
+	            and games_recomm = #{games_recomm}
+	        </if>
+	    </where>
+	</select>
+	<!-- 精确 条件查询 返回数据集合 -->
+	<select id="selectListT" parameterType="com.zhz233.bs.model.TGamesModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="games_no != null">
+	            and games_no = #{games_no}
+	        </if>
+	        <if test="games_type != null">
+	            and games_type = #{games_type}
+	        </if>
+	        <if test="games_name != null">
+	            and games_name = #{games_name}
+	        </if>
+	        <if test="games_recomm != null">
+	            and games_recomm = #{games_recomm}
+	        </if>
+	    </where>
+	</select>
+	<!-- update 更新一条数据 -->
+	<update id="update" parameterType="com.zhz233.bs.model.TGamesModel">
+	    UPDATE Tab_Games
+	    <set>
+	        <if test="games_no != null">
+	            games_no = #{games_no}
+	        </if>
+	        <if test="games_type != null">
+	            games_type = #{games_type}
+	        </if>
+	        <if test="games_name != null">
+	            games_name = #{games_name}
+	        </if>
+	        <if test="games_recomm != null">
+	            games_recomm = #{games_recomm}
+	        </if>
+	    </set>
+	    <where>
+	    	<if test="games_no != null">
+	            and games_no = #{games_no}
+	        </if>
+	    </where>
+	</update>
+</mapper>	

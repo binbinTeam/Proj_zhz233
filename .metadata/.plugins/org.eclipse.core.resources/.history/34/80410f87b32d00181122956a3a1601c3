@@ -1,0 +1,21 @@
+/**
+* Copyright © 2018 ZhzTeam Info. All rights reserved.
+*  
+* @Title: CookieUtils.java 
+* @Package com.zhz233.comn.utils 
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月22日
+* @version V1.0.0
+*/
+package com.zhz233.comn.utils;
+
+/**
+* @ClassName: CookieUtils
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月22日
+*/
+public class CookieUtils {
+	
+}

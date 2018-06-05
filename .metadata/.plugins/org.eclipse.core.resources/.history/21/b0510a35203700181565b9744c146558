@@ -1,0 +1,83 @@
+/**
+* Copyright © 2018 ZhzTeam Info. All rights reserved.
+*  
+* @Title: TUserModel.java 
+* @Package com.zhz233.bs.idao 
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月20日
+* @version V1.0.0
+*/
+package com.zhz233.bs.model;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+* @ClassName: TUserModel
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月20日
+*/
+public class TUserModel implements Serializable{
+	/** 
+	 * @Fields serialVersionUID : TODO() 
+	*/ 
+	private static final long serialVersionUID = 1L;
+	/**
+	 * 实体属性
+	 */
+	private long id;//id
+	private String user_no;
+	private String account;//账号
+	private String cell_phone;//绑定号码
+	private String password;//登录密码
+	private Date update_date;//更新时间
+	private Date addtime;//注册时间
+	private String access;//登录允许//0：不允许1：普通用户2：管理员3：超级管理员4：商家账户
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
+	}
+	public String getAccount() {
+		return account;
+	}
+	public void setAccount(String account) {
+		this.account = account;
+	}
+	public String getCell_phone() {
+		return cell_phone;
+	}
+	public void setCell_phone(String cell_phone) {
+		this.cell_phone = cell_phone;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public Date getUpdate_date() {
+		return update_date;
+	}
+	public void setUpdate_date(Date update_date) {
+		this.update_date = update_date;
+	}
+	public Date getAddtime() {
+		return addtime;
+	}
+	public void setAddtime(Date addtime) {
+		this.addtime = addtime;
+	}
+	public String getAccess() {
+		return access;
+	}
+	public void setAccess(String access) {
+		this.access = access;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+}

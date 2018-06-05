@@ -1,0 +1,36 @@
+/**
+* Copyright © 2018 ZhzTeam Info. All rights reserved.
+*  
+* @Title: TimeUtils.java 
+* @Package com.zhz233.comn.utils 
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月21日
+* @version V1.0.0
+*/
+package com.zhz233.comn.utils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+* @ClassName: TimeUtils
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月21日
+*/
+public class TimeUtils {
+	
+	/**
+	 * 
+	* @Title: getDate
+	* @Description: TODO 获取时间戳
+	* @return 
+	* String  
+	* @throws
+	 */
+	public static String getDate() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+		return df.format(new Date());// new Date()为获取当前系统时间，也可使用当前时间戳
+	}
+}

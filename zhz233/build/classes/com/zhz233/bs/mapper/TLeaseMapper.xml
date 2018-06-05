@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhz233.bs.idao.TLeaseIDAO">
+	<!-- resultMap 实体映射-->
+	<resultMap type="com.zhz233.bs.model.TLeaseModel" id="TLease">
+	    <id property="id" column="id"/>
+	    <result property="order_no" column="order_no"/>
+	    <result property="sale_no" column="sale_no"/>
+	    <result property="buyer_no" column="buyer_no"/>
+	    <result property="goods_no" column="goods_no"/>
+	    <result property="order_amount" column="order_amount"/>
+		<result property="order_start_time" column="order_start_time"/>
+	    <result property="order_end_time" column="order_end_time"/>
+	    <result property="order_state" column="order_state"/>
+	    <result property="update_time" column="update_time"/>
+	    <result property="create_time" column="create_time"/>
+	</resultMap>
+	<!-- VLease 实体映射-->
+	<resultMap type="com.zhz233.bs.model.VLeaseModel" id="VLease">
+	    <result property="order_no" column="order_no"/>
+	    <result property="sale_no" column="sale_no"/>
+	    <result property="goods_no" column="goods_no"/>
+	    <result property="order_amount" column="order_amount"/>
+		<result property="order_start_time" column="order_start_time"/>
+	    <result property="order_end_time" column="order_end_time"/>
+	    <result property="order_state" column="order_state"/>
+	    <result property="update_time" column="update_time"/>
+	    <result property="create_time" column="create_time"/>
+	</resultMap>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAuto">  
+		SELECT id,order_no,sale_no,buyer_no,goods_no,order_amount,order_start_time,order_end_time,order_state,update_time,create_time
+		FROM Tab_Lease_Order
+	</sql>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectV">  
+		SELECT order_no,sale_no,goods_no,order_amount,order_start_time,order_end_time,order_state,update_time,create_time
+		FROM Tab_Lease_Order
+	</sql>
+	<!-- 增加一条用户数据 -->
+	<insert id="insert" parameterType="com.zhz233.bs.model.TLeaseModel">
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+			insert into Tab_Lease_Order(order_no,sale_no,buyer_no,goods_no,order_amount,
+			order_start_time,order_end_time,update_time,create_time)
+			values(#{order_no},#{sale_no},#{buyer_no},#{goods_no},#{order_amount},
+			#{order_start_time},#{order_end_time},NOW(),NOW())
+	</insert>
+	<!-- 删除一条用户数据 -->
+	<delete id="delete" parameterType="com.zhz233.bs.model.TLeaseModel">
+		DELETE FROM Tab_Lease_Order
+	    <where>
+	        <if test="order_no != null">
+	            and order_no = #{order_no}
+	        </if>
+	    </where>
+	</delete>
+	<!-- 更新一条数据 -->
+	<update id="update" parameterType="com.zhz233.bs.model.TLeaseModel">
+	    UPDATE Tab_Lease_Order
+	    <set>
+	        <if test="order_no != null">
+	            order_no = #{order_no}
+	        </if>
+	    </set>
+	    <where>
+	    	<if test="order_no != null">
+	            and order_no = #{order_no}
+	        </if>
+	    </where>
+	</update>
+	<!-- 条件查询返回no -->
+	<select id="selectN" resultType="java.lang.String">
+		SELECT order_no 
+		FROM Tab_Lease_Order
+		ORDER BY create_time DESC 
+		LIMIT 1
+	</select>
+	<!-- 精确 查询一条记录 -->
+	<select id="selectT" parameterType="com.zhz233.bs.model.TLeaseModel" resultType="com.zhz233.bs.model.TLeaseModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="order_no != null">
+	            and order_no = #{order_no}
+	        </if>
+	    </where>
+		LIMIT 1
+	</select>
+	<!-- 精确 查询记录集合 -->
+	<select id="selectListT" parameterType="com.zhz233.bs.model.TLeaseModel" resultType="com.zhz233.bs.model.TLeaseModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="order_no != null">
+	            and order_no = #{order_no}
+	        </if>
+	        <if test="sale_no != null">
+	            and sale_no = #{sale_no}
+	        </if>
+	        <if test="update_time != null">
+	            and update_time = #{update_time}
+	        </if>
+	        <if test="create_time != null">
+	            and create_time = #{create_time}
+	        </if>
+	    </where>
+	</select>
+	<!-- selectPaginationListT -->
+	<select id="selectPaginationListT"  resultMap="VLease">
+		<include refid="selectV"/>
+		<where>
+			<if test="account_no != null">
+	            and buyer_no = #{account_no}
+	        </if>
+	        <if test="order_state != null">
+	        	and order_state = #{order_state}
+	        </if>
+	    	<if test="pModel.start_time != null ">
+	            and update_time <![CDATA[>=]]> #{pModel.start_time}
+	        </if>
+	        <if test="pModel.end_time != null ">
+	            and update_time <![CDATA[<=]]> #{pModel.end_time}
+	        </if>
+		</where>
+		ORDER BY update_time DESC
+		<if test="pModel.startPage != null and pModel.pageSize != null">  
+        	LIMIT #{pModel.startPage},#{pModel.pageSize}
+    	</if>
+	</select>
+	<!-- 精确  时间段 查询记录集合 -->
+	<select id="selectTimeListT" resultType="com.zhz233.bs.model.TLeaseModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="beginDate != null">
+				AND update_time <![CDATA[>=]]> #{beginDate}
+			</if>
+ 			<if test="endDate != null">
+ 				AND update_time <![CDATA[<=]]>#{endDate}
+ 			</if>
+	    </where>
+	</select>
+	<!-- 查询所有记录集合 -->
+	<select id="select" resultType="com.zhz233.bs.model.TLeaseModel">
+		<include refid="selectAuto"/>
+	</select>
+	<!-- 模糊 查询记录集合 -->
+	<select id="selectBlurListT"  parameterType="com.zhz233.bs.model.TLeaseModel" resultType="com.zhz233.bs.model.TLeaseModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="order_no != null">
+	            or order_no like CONCAT('%',#{order_no},'%')
+	        </if>
+	        <if test="sale_no != null">
+	            or sale_no like CONCAT('%',#{sale_no},'%')
+	        </if>
+	        <if test="update_time != null">
+	            or update_time like CONCAT('%',#{update_time},'%')
+	        </if>
+	        <if test="create_time != null">
+	            or create_time like CONCAT('%',#{create_time},'%')
+	        </if>
+	    </where>
+	</select>
+</mapper>	

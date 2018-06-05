@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhz233.bs.idao.TAreasIDAO">
+	<!-- resultMap 实体映射-->
+	<resultMap type="com.zhz233.bs.model.TAreasModel" id="TUser">
+	    <id property="id" column="id"/>
+	    <result property="account_no" column="account_no"/>
+	    <result property="certification" column="certification"/>
+	    <result property="available" column="available"/>
+	    <result property="frozen" column="frozen"/>
+	    <result property="credit_level" column="credit_level"/>
+	    <result property="traders_password" column="traders_password"/>
+	    <result property="traders_alipay" column="traders_alipay"/>
+	    <result property="traders_wechat_pay" column="traders_wechat_pay"/>
+	    <result property="update_time" column="update_time"/>
+	    <result property="create_time" column="create_time"/>
+	</resultMap>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAuto">  
+		SELECT id,account_no,certification,available,frozen,credit_level,traders_password,traders_alipay,traders_wechat_pay,update_time,create_time
+		FROM tab_Areas
+	</sql>	
+</mapper>	

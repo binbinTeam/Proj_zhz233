@@ -1,0 +1,479 @@
+/**
+* Copyright © 2018 ZhzTeam Info. All rights reserved.
+*  
+* @Title: .java 
+* @Package com.zhz233.bs.controller 
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月18日
+* @version V1.0.0
+*/
+package com.zhz233.bs.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.zhz233.bs.model.SearchModel;
+import com.zhz233.bs.model.TGamesModel;
+import com.zhz233.bs.model.TGoodsModel;
+import com.zhz233.bs.model.TNoticeModel;
+import com.zhz233.bs.model.TUserModel;
+import com.zhz233.bs.model.VGamesModel;
+import com.zhz233.bs.model.VNoticeModel;
+import com.zhz233.bs.model.VSpecialGoodsModel;
+import com.zhz233.bs.result.InfoResult;
+import com.zhz233.bs.result.ZHZResult;
+import com.zhz233.bs.service.impl.TGamesServiceImpl;
+import com.zhz233.bs.service.impl.TGoodsRentMoreLOLServiceImpl;
+import com.zhz233.bs.service.impl.TGoodsRentServiceImpl;
+import com.zhz233.bs.service.impl.TGoodsServiceImpl;
+import com.zhz233.bs.service.impl.TNoticeServiceImpl;
+import com.zhz233.bs.service.impl.TUserServiceImpl;
+import com.zhz233.comn.config.ModelConfig;
+import com.zhz233.comn.config.ZHZConfig;
+import com.zhz233.comn.utils.TimeUtils;
+import com.zhz233.comn.utils.ZHZUtils;
+
+/**
+* @ClassName: 
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月18日
+*/
+@Controller
+@RequestMapping("/info")
+@Scope("prototype")
+public class InfoOfController {
+	
+	/**
+	 * 定义全局变量
+	 */
+	private Map<String, Object> map;
+	private Map<String, Object> reMap;
+	private ZHZResult zhzResult;
+	private InfoResult infoResult;
+	
+	private TNoticeModel tNoticeModel;
+	private TGamesModel tGamesModel;
+	private TUserModel tUserModel;
+	private TGoodsModel tGoodsModel;
+	
+	private VSpecialGoodsModel vSpecialGoodsModel;
+	
+	private List<VNoticeModel> vnoticeList;
+	private List<VGamesModel> vgameList;
+	private List<VSpecialGoodsModel> vSpecialGoodsModelList;
+	//private List<TRentOrder> rentOrderList;
+	
+	//httpsession
+	private HttpSession hSession;
+	//ssid
+	private String ssid ;
+	/**
+	 * 注解资源
+	 */
+	@Resource
+	private TUserServiceImpl tUserServiceImpl;
+	@Resource
+	private TNoticeServiceImpl tNoticeServiceImpl;
+	@Resource
+	private TGamesServiceImpl tGamesServiceImpl;
+	@Resource
+	private TGoodsRentMoreLOLServiceImpl tGoodsRentMoreLOLServiceImpl;
+	@Resource
+	private TGoodsRentServiceImpl tGoodsRentServiceImpl;
+	@Resource
+	private TGoodsServiceImpl tGoodsServiceImpl;
+	/**
+	 * 
+	* @Title: showUserInfo
+	* @Description: TODO 
+	* @param hsRequest
+	* @param hsResponse
+	* @return 
+	* Map<String,Object>  
+	* @throws
+	 */
+	@RequestMapping(value="/showUserInfo", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> showUserInfo(HttpServletRequest hsRequest,
+			HttpServletResponse hsResponse){
+		//初始化map zhzResult
+		map = new HashMap<String, Object>();
+		reMap = new HashMap<String, Object>();
+		zhzResult = new ZHZResult();
+		infoResult = new InfoResult();
+		//获取session id
+		hSession = hsRequest.getSession();
+		ssid = hSession.getId();
+		//获取username
+		String uacc = ZHZUtils.getUsr(ssid);
+		//获取登录状态
+		reMap.put("lab_user", uacc);
+		//判断数据是否获取成功
+		if(reMap != null) {//放置返回数据
+			infoResult.setReMap(reMap);
+			infoResult.setCode(ZHZConfig.REQCODE_1024);
+			infoResult.setMsg("首页信息获取成功");
+			zhzResult.setCode(ZHZConfig.REQCODE_1022);
+			zhzResult.setMsg("首页信息获取成功");
+		}else {
+			infoResult.setCode(ZHZConfig.REQCODE_1023);
+			infoResult.setMsg("首页信息获取失败");
+			zhzResult.setCode(ZHZConfig.REQCODE_1021);
+			zhzResult.setMsg("首页信息获取失败");
+		}
+		infoResult.setZtime(TimeUtils.getDate());
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("iResult", infoResult);
+		map.put("result", zhzResult);
+		//放入返回数据
+		return map;
+	}
+	/**
+	 * 
+	* @Title: showNoticeInfo
+	* @Description: TODO 首页展示信息加载
+	* @param hsRequest
+	* @param hsResponse
+	* @return 
+	* Map<String,Object>  
+	* @throws
+	 */
+	@RequestMapping(value="/showNoticeInfo", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> showNoticeInfo(HttpServletRequest hsRequest,
+			HttpServletResponse hsResponse){
+		//初始化map zhzResult
+		map = new HashMap<String, Object>();
+		reMap = new HashMap<String, Object>();
+		zhzResult = new ZHZResult();
+		infoResult = new InfoResult();
+		tNoticeModel = new TNoticeModel();
+		//查询list 公告
+		vnoticeList = new ArrayList<VNoticeModel>();
+		tNoticeModel.setNotice_type(ModelConfig.TNOTICE_TYPE_1);
+		vnoticeList = tNoticeServiceImpl.selectTop5ByNT(tNoticeModel);
+		reMap.put("notice", vnoticeList);
+		//查询list 入门须知
+		tNoticeModel.setNotice_type(ModelConfig.TNOTICE_TYPE_2);
+		vnoticeList = tNoticeServiceImpl.selectTop5ByNT(tNoticeModel);
+		reMap.put("newbie", vnoticeList);
+		//查询list 网站更新
+		tNoticeModel.setNotice_type(ModelConfig.TNOTICE_TYPE_3);
+		vnoticeList = tNoticeServiceImpl.selectTop5ByNT(tNoticeModel);
+		reMap.put("upsite", vnoticeList);
+		//判断数据是否获取成功
+		if(reMap != null) {//放置返回数据
+			infoResult.setReMap(reMap);
+			infoResult.setCode(ZHZConfig.REQCODE_1024);
+			infoResult.setMsg("首页公告信息获取成功");
+			zhzResult.setCode(ZHZConfig.REQCODE_1022);
+			zhzResult.setMsg("首页公告信息获取成功");
+		}else {
+			infoResult.setCode(ZHZConfig.REQCODE_1023);
+			infoResult.setMsg("首页公告信息获取失败");
+			zhzResult.setCode(ZHZConfig.REQCODE_1021);
+			zhzResult.setMsg("首页公告信息获取失败");
+		}
+		infoResult.setZtime(TimeUtils.getDate());
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("iResult", infoResult);
+		map.put("result", zhzResult);
+		//放入返回数据
+		return map;
+	}
+	/**
+	 * 
+	* @Title: showRentInfo
+	* @Description: TODO 
+	* @param hsRequest
+	* @param hsResponse
+	* @return 
+	* Map<String,Object>  
+	* @throws
+	 */
+	@RequestMapping(value="/showRentInfo", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> showRentInfo(HttpServletRequest hsRequest,
+			HttpServletResponse hsResponse){
+		//初始化map zhzResult
+		map = new HashMap<String, Object>();
+		reMap = new HashMap<String, Object>();
+		zhzResult = new ZHZResult();
+		infoResult = new InfoResult();
+		//查询list 租号订单交易
+		//rentOrderList = new ArrayList<TNoticeModel>();
+		//noticeList = tNoticeServiceImpl.selectListTop5ByKey(ModelConfig.TNOTICE_TYPE_1);
+		//reMap.put("rentOrder", rentOrderList);
+		//判断数据是否获取成功
+		if(reMap != null) {//放置返回数据
+			infoResult.setReMap(reMap);
+			infoResult.setCode(ZHZConfig.REQCODE_1024);
+			infoResult.setMsg("首页出租信息获取成功");
+			zhzResult.setCode(ZHZConfig.REQCODE_1022);
+			zhzResult.setMsg("首页出租信息获取成功");
+		}else {
+			infoResult.setCode(ZHZConfig.REQCODE_1023);
+			infoResult.setMsg("首页出租信息获取失败");
+			zhzResult.setCode(ZHZConfig.REQCODE_1021);
+			zhzResult.setMsg("首页出租信息获取失败");
+		}
+		infoResult.setZtime(TimeUtils.getDate());
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("iResult", infoResult);
+		map.put("result", zhzResult);
+		//放入返回数据
+		return map;
+	}
+	/**
+	 * 
+	* @Title: showBlackInfo
+	* @Description: TODO 
+	* @param hsRequest
+	* @param hsResponse
+	* @return 
+	* Map<String,Object>  
+	* @throws
+	 */
+	@RequestMapping(value="/showBlackInfo", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> showBlackInfo(HttpServletRequest hsRequest,
+			HttpServletResponse hsResponse){
+		//初始化map zhzResult
+		map = new HashMap<String, Object>();
+		reMap = new HashMap<String, Object>();
+		zhzResult = new ZHZResult();
+		infoResult = new InfoResult();
+		//查询list 租号订单交易
+		//blackList = new ArrayList<TNoticeModel>();
+		//blackList = tNoticeServiceImpl.selectListTop5ByKey(ModelConfig.TNOTICE_TYPE_1);
+		//reMap.put("black", blackList);
+		//判断数据是否获取成功
+		if(reMap != null) {//放置返回数据
+			infoResult.setReMap(reMap);
+			infoResult.setCode(ZHZConfig.REQCODE_1024);
+			infoResult.setMsg("首页黑名单信息获取成功");
+			zhzResult.setCode(ZHZConfig.REQCODE_1022);
+			zhzResult.setMsg("首页黑名单信息获取成功");
+		}else {
+			infoResult.setCode(ZHZConfig.REQCODE_1023);
+			infoResult.setMsg("首页黑名单信息获取失败");
+			zhzResult.setCode(ZHZConfig.REQCODE_1021);
+			zhzResult.setMsg("首页黑名单信息获取失败");
+		}
+		infoResult.setZtime(TimeUtils.getDate());
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("iResult", infoResult);
+		map.put("result", zhzResult);
+		//放入返回数据
+		return map;
+	}
+	/**
+	 * 
+	* @Title: showSearchInfo
+	* @Description: TODO 
+	* @param hsRequest
+	* @param hsResponse
+	* @return 
+	* Map<String,Object>  
+	* @throws
+	 */
+	@RequestMapping(value="/showSearchInfo", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> showSearchInfo(HttpServletRequest hsRequest,
+			HttpServletResponse hsResponse,@RequestBody SearchModel searchModel){
+		//初始化map zhzResult
+		map = new HashMap<String, Object>();
+		reMap = new HashMap<String, Object>();
+		zhzResult = new ZHZResult();
+		infoResult = new InfoResult();
+		
+		reMap.put("key", "无");
+		
+		//判断数据是否获取成功
+		if(reMap != null) {//放置返回数据
+			infoResult.setReMap(reMap);
+			infoResult.setCode(ZHZConfig.REQCODE_1024);
+			infoResult.setMsg("首页黑名单信息获取成功");
+			zhzResult.setCode(ZHZConfig.REQCODE_1022);
+			zhzResult.setMsg("首页黑名单信息获取成功");
+		}else {
+			infoResult.setCode(ZHZConfig.REQCODE_1023);
+			infoResult.setMsg("首页黑名单信息获取失败");
+			zhzResult.setCode(ZHZConfig.REQCODE_1021);
+			zhzResult.setMsg("首页黑名单信息获取失败");
+		}
+		infoResult.setZtime(TimeUtils.getDate());
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("iResult", infoResult);
+		map.put("result", zhzResult);
+		//放入返回数据
+		return map;
+	}
+	/**
+	 * 
+	* @Title: showTassteInfo
+	* @Description: TODO 
+	* @param hsRequest
+	* @param hsResponse
+	* @return 
+	* Map<String,Object>  
+	* @throws
+	 */
+	@RequestMapping(value="/showGamesInfo", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> showGamesInfo(HttpServletRequest hsRequest,
+			HttpServletResponse hsResponse){
+		//初始化map zhzResult
+		map = new HashMap<String, Object>();
+		reMap = new HashMap<String, Object>();
+		zhzResult = new ZHZResult();
+		infoResult = new InfoResult();
+		tGamesModel = new TGamesModel();
+		//查询list 
+		vgameList = new ArrayList<VGamesModel>();
+		//查询list 热门
+		vgameList = tGamesServiceImpl.selectTop8ByGR();
+		reMap.put("taste_1", vgameList);
+		//查询list 端游
+		tGamesModel.setgames_type(ModelConfig.TGAME_TYPE_1);
+		vgameList = tGamesServiceImpl.selectTop8ByGT(tGamesModel);
+		reMap.put("taste_2", vgameList);
+		//查询list 手游
+		tGamesModel.setgames_type(ModelConfig.TGAME_TYPE_3);
+		vgameList = tGamesServiceImpl.selectTop8ByGT(tGamesModel);
+		reMap.put("taste_3", vgameList);
+		//查询list 页游
+		tGamesModel.setgames_type(ModelConfig.TGAME_TYPE_2);
+		vgameList = tGamesServiceImpl.selectTop8ByGT(tGamesModel);
+		reMap.put("taste_4", vgameList);
+		//判断数据是否获取成功
+		if(reMap != null) {//放置返回数据
+			infoResult.setReMap(reMap);
+			infoResult.setCode(ZHZConfig.REQCODE_1028);
+			infoResult.setMsg("体验页信息获取成功");
+			zhzResult.setCode(ZHZConfig.REQCODE_1026);
+			zhzResult.setMsg("体验页信息获取成功");
+		}else {
+			infoResult.setCode(ZHZConfig.REQCODE_1027);
+			infoResult.setMsg("体验页信息获取失败");
+			zhzResult.setCode(ZHZConfig.REQCODE_1025);
+			zhzResult.setMsg("体验页信息获取失败");
+		}
+		infoResult.setZtime(TimeUtils.getDate());
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("iResult", infoResult);
+		map.put("result", zhzResult);
+		//放入返回数据
+		return map;
+	}
+	/**
+	 * 
+	* @Title: showAutoInfo
+	* @Description: TODO 
+	* @param hsRequest
+	* @param hsResponse
+	* @param GoodsNo
+	* @return 
+	* Map<String,Object>  
+	* @throws
+	 */
+	@RequestMapping(value="/showAutoInfo", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String,Object> showAutoInfo(HttpServletRequest hsRequest,
+			HttpServletResponse hsResponse,@Param("GoodsNo") String GoodsNo){
+		//初始化map zhzResult
+		map = new HashMap<String, Object>();
+		reMap = new HashMap<String, Object>();
+		zhzResult = new ZHZResult();
+		infoResult = new InfoResult();
+		
+		//System.err.println(GoodsNo);
+		
+		
+		//判断数据是否获取成功
+		if(reMap != null) {//放置返回数据
+			infoResult.setReMap(reMap);
+			infoResult.setCode(ZHZConfig.REQCODE_1028);
+			infoResult.setMsg("商品信息获取成功");
+			zhzResult.setCode(ZHZConfig.REQCODE_1026);
+			zhzResult.setMsg("商品信息获取成功");
+		}else {
+			infoResult.setCode(ZHZConfig.REQCODE_1027);
+			infoResult.setMsg("商品信息获取失败");
+			zhzResult.setCode(ZHZConfig.REQCODE_1025);
+			zhzResult.setMsg("体验页信息获取失败");
+		}
+		infoResult.setZtime(TimeUtils.getDate());
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("iResult", infoResult);
+		map.put("result", zhzResult);
+		//放入返回数据
+		return map;
+	}
+	/**
+	 * 
+	* @Title: showRentTasteInfo
+	* @Description: TODO 
+	* @param hsRequest
+	* @param hsResponse
+	* @return 
+	* Map<String,Object>  
+	* @throws
+	 */
+	@RequestMapping(value="/showRentTasteInfo", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> showRentTasteInfo(HttpServletRequest hsRequest,
+			HttpServletResponse hsResponse){
+		//初始化map zhzResult
+		map = new HashMap<String, Object>();
+		reMap = new HashMap<String, Object>();
+		zhzResult = new ZHZResult();
+		infoResult = new InfoResult();
+		//获取  体验商品 数据
+		tGoodsModel = new TGoodsModel();
+		tGoodsModel.setGoods_status(ModelConfig.TGOODSSTATUS_TYPE_1);
+		tGoodsModel.setGoods_recomm(ModelConfig.TGOODSRECOMM_TYPE_3);
+		
+		vSpecialGoodsModelList = tGoodsServiceImpl.selectTop10ByTRS(tGoodsModel);
+		
+		/*for(VSpecialGoodsModel li:vSpecialGoodsModelList) {
+			System.err.println(li.getGoods_no());
+		}*/
+		reMap.put("taste_special", vSpecialGoodsModelList);
+		//判断数据是否获取成功
+		if(reMap != null) {//放置返回数据
+			infoResult.setReMap(reMap);
+			infoResult.setCode(ZHZConfig.REQCODE_1028);
+			infoResult.setMsg("体验页商品信息获取成功");
+			zhzResult.setCode(ZHZConfig.REQCODE_1026);
+			zhzResult.setMsg("体验页商品信息获取成功");
+		}else {
+			infoResult.setCode(ZHZConfig.REQCODE_1027);
+			infoResult.setMsg("体验页商品信息获取失败");
+			zhzResult.setCode(ZHZConfig.REQCODE_1025);
+			zhzResult.setMsg("体验页商品信息获取失败");
+		}
+		infoResult.setZtime(TimeUtils.getDate());
+		zhzResult.setZtime(TimeUtils.getDate());
+		map.put("iResult", infoResult);
+		map.put("result", zhzResult);
+		//放入返回数据
+		return map;
+	}
+}

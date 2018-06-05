@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhz233.bs.idao.TGoodsRentMoreLOLIDAO">
+	<!-- resultMap 实体映射-->
+	<resultMap type="com.zhz233.bs.model.TGoodsRentMoreLOLModel" id="TGoodsRentMoreLOL">
+	    <id property="id" column="id"/>
+	    <result property="goods_no" column="goods_no"/>
+	    <result property="goods_lol_role" column="goods_lol_role"/>
+	    <result property="goods_lol_area" column="goods_lol_area"/>
+	    <result property="goods_lol_server" column="goods_lol_server"/>
+	    <result property="goods_lol_grade" column="goods_lol_grade"/>
+	    <result property="goods_lol_rank" column="goods_lol_rank"/>
+	    <result property="goods_lol_case" column="goods_lol_case"/>
+	    <result property="goods_lol_access" column="goods_lol_access"/>
+	    <result property="goods_lol_skin" column="goods_lol_skin"/>
+	    <result property="goods_lol_hero" column="goods_lol_hero"/>
+	</resultMap>
+	<!-- resultMap 视图实体映射-->
+	
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAuto">  
+		SELECT id,goods_no,goods_lol_role,goods_lol_area,goods_lol_server,
+		goods_lol_grade,goods_lol_rank,goods_lol_case,goods_lol_access,goods_lol_skin,
+		goods_lol_hero
+		FROM Tab_Goods_Rent_More_LOL
+	</sql>
+	<!-- 复用sql语句  查询表部分字段 -->
+	
+	<!-- 增加一条用户数据 -->
+	<insert id="insert" parameterType="com.zhz233.bs.model.TGoodsRentMoreLOLModel">
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+			insert 
+			into Tab_Goods_Rent_More_LOL(goods_no,goods_lol_role,
+			goods_lol_area,goods_lol_server,goods_lol_grade,
+			goods_lol_rank,goods_lol_case,goods_lol_access,goods_lol_skin,
+			goods_lol_hero)
+			values(#{goods_no},#{goods_lol_role},
+			#{goods_lol_area},#{goods_lol_server},#{goods_lol_grade},
+			#{goods_lol_rank},#{goods_lol_case},#{goods_lol_access},#{goods_lol_skin},
+			#{goods_lol_hero})
+	</insert>
+	<!-- 删除一条用户数据 -->
+	<delete id="delete" parameterType="com.zhz233.bs.model.TGoodsRentMoreLOLModel">
+		DELETE FROM Tab_Goods_Rent_More_LOL
+	    <where>
+	    	<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	    </where>
+	</delete>
+	<!-- 返回所有数据 -->
+	<select id="select" parameterType="com.zhz233.bs.model.TGoodsRentMoreLOLModel" resultType="com.zhz233.bs.model.TGoodsRentMoreLOLModel">
+		<include refid="selectAuto"/>
+	</select>
+	<!-- 精确 条件查询 返回一条数据 -->
+	<select id="selectT" parameterType="com.zhz233.bs.model.TGoodsRentMoreLOLModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	        <if test="goods_lol_role != null">
+	            and goods_lol_role = #{goods_lol_role}
+	        </if>
+	        <if test="goods_lol_area != null">
+	            and goods_lol_area = #{goods_lol_area}
+	        </if>
+	        <if test="goods_lol_server != null">
+	            and goods_lol_server = #{goods_lol_server}
+	        </if>
+	         <if test="goods_lol_grade != null">
+	            and goods_lol_grade = #{goods_lol_grade}
+	        </if>
+	        <if test="goods_lol_rank != null">
+	            and goods_lol_rank = #{goods_lol_rank}
+	        </if>
+	        <if test="goods_lol_case != null">
+	            and goods_lol_case = #{goods_lol_case}
+	        </if>
+	        <if test="goods_lol_access != null">
+	            and goods_lol_access = #{goods_lol_access}
+	        </if>
+	        <if test="goods_lol_skin != null">
+	            and goods_lol_skin = #{goods_lol_skin}
+	        </if>
+	        <if test="goods_lol_hero != null">
+	            and goods_lol_hero = #{goods_lol_hero}
+	        </if>
+	    </where>
+	</select>
+	<!-- 精确 条件查询 返回数据集合 -->
+	<select id="selectListT" parameterType="com.zhz233.bs.model.TGoodsRentMoreLOLModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	        <if test="goods_lol_role != null">
+	            and goods_lol_role = #{goods_lol_role}
+	        </if>
+	        <if test="goods_lol_area != null">
+	            and goods_lol_area = #{goods_lol_area}
+	        </if>
+	        <if test="goods_lol_server != null">
+	            and goods_lol_server = #{goods_lol_server}
+	        </if>
+	         <if test="goods_lol_grade != null">
+	            and goods_lol_grade = #{goods_lol_grade}
+	        </if>
+	        <if test="goods_lol_rank != null">
+	            and goods_lol_rank = #{goods_lol_rank}
+	        </if>
+	        <if test="goods_lol_case != null">
+	            and goods_lol_case = #{goods_lol_case}
+	        </if>
+	        <if test="goods_lol_access != null">
+	            and goods_lol_access = #{goods_lol_access}
+	        </if>
+	        <if test="goods_lol_skin != null">
+	            and goods_lol_skin = #{goods_lol_skin}
+	        </if>
+	        <if test="goods_lol_hero != null">
+	            and goods_lol_hero = #{goods_lol_hero}
+	        </if>
+	    </where>
+	</select>
+	<!-- update 更新一条数据 -->
+	<update id="update" parameterType="com.zhz233.bs.model.TGoodsRentMoreLOLModel">
+	    UPDATE Tab_Goods_Rent_More_LOL
+	    <set>
+	        <if test="goods_no != null">
+	            goods_no = #{goods_no}
+	        </if>
+	        <if test="goods_lol_role != null">
+	            goods_lol_role = #{goods_lol_role}
+	        </if>
+	        <if test="goods_lol_area != null">
+	            goods_lol_area = #{goods_lol_area}
+	        </if>
+	        <if test="goods_lol_server != null">
+	            goods_lol_server = #{goods_lol_server}
+	        </if>
+	         <if test="goods_lol_grade != null">
+	            goods_lol_grade = #{goods_lol_grade}
+	        </if>
+	        <if test="goods_lol_rank != null">
+	            goods_lol_rank = #{goods_lol_rank}
+	        </if>
+	        <if test="goods_lol_case != null">
+	            goods_lol_case = #{goods_lol_case}
+	        </if>
+	        <if test="goods_lol_access != null">
+	            goods_lol_access = #{goods_lol_access}
+	        </if>
+	        <if test="goods_lol_skin != null">
+	            goods_lol_skin = #{goods_lol_skin}
+	        </if>
+	        <if test="goods_lol_hero != null">
+	            goods_lol_hero = #{goods_lol_hero}
+	        </if>
+	    </set>
+	    <where>
+	    	<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	    </where>
+	</update>
+</mapper>	

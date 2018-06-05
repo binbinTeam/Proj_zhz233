@@ -1,0 +1,8 @@
+$(document).ready(function() {
+	ShowRentInfo();
+});
+/**
+ * id 集合
+ */
+var psonl_content = $("#psonl_content");
+

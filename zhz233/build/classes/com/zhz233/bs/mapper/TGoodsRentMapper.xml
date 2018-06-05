@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhz233.bs.idao.TGoodsRentIDAO">
+	<!-- resultMap 实体映射-->
+	<resultMap type="com.zhz233.bs.model.TGoodsRentModel" id="TGoodsRent">
+	    <id property="id" column="id"/>
+	    <result property="goods_no" column="goods_no"/>
+	    <result property="goods_game_no" column="goods_game_no"/>
+	    <result property="goods_hour" column="goods_hour"/>
+	    <result property="goods_night" column="goods_night"/>
+	    <result property="goods_day" column="goods_day"/>
+	    <result property="goods_week" column="goods_week"/>
+	    <result property="goods_month" column="goods_month"/>
+	    <result property="goods_year" column="goods_year"/>
+	    <result property="goods_access" column="goods_access"/>
+	</resultMap>
+	<!-- resultMap VGoodsMore 视图实体映射-->
+	<resultMap type="com.zhz233.bs.model.VGoodsMoreModel" id="VGoodsMore">
+	    <result property="goods_no" column="goods_no"/>
+	    <result property="account_no" column="account_no"/>
+	    <result property="goods_theme" column="goods_theme"/>
+	    <result property="goods_hour" column="goods_hour"/>
+	    <result property="goods_night" column="goods_night"/>
+	    <result property="goods_day" column="goods_day"/>
+	    <result property="goods_week" column="goods_week"/>
+	    <result property="goods_recomm" column="goods_recomm"/>
+	    <result property="games_name" column="games_name"/>
+	    <result property="areas_name" column="areas_name"/>
+	    <result property="servers_name" column="servers_name"/>
+	    <result property="goods_logon_style" column="goods_logon_style"/>
+	    <result property="goods_compensate" column="goods_compensate"/>
+	    <result property="goods_lol_role" column="goods_lol_role"/>
+	    <result property="goods_lol_rank" column="goods_lol_rank"/>
+	    <result property="goods_lol_grade" column="goods_lol_grade"/>
+	    <result property="goods_lol_case" column="goods_lol_case"/>
+	    <result property="goods_lol_access" column="goods_lol_access"/>
+	    <result property="goods_delay" column="goods_delay"/>
+	    <result property="goods_beforehand" column="goods_beforehand"/>
+	    <result property="goods_short_time" column="goods_short_time"/>
+	    <result property="goods_credit_level" column="goods_credit_level"/>
+	</resultMap>
+	<!-- 复用sql语句  查询表所有字段 -->
+	<sql id="selectAuto">  
+		SELECT id,goods_no,goods_game_no,goods_hour,goods_night,
+		goods_day,goods_week,goods_month,goods_year,goods_access,
+		goods_password,goods_logon_style,goods_compensate,goods_beforehand,
+		goods_delay,goods_short_time,goods_credit_level,goods_view_count,
+		goods_rent_count,goods_recomm_count,goods_complaint_count
+		FROM Tab_Goods_Rent
+	</sql>
+	<!-- 复用sql语句  查询表部分字段 -->
+	<sql id="selectInfo">
+		SELECT goods_no,account_no,goods_theme,goods_hour,goods_night,
+		goods_day,goods_week,goods_recomm,games_name,areas_name,servers_name,
+		goods_logon_style,goods_compensate,goods_lol_role,goods_lol_rank,
+		goods_lol_grade,goods_lol_case,goods_lol_access,goods_delay,
+		goods_beforehand,goods_short_time,goods_credit_level
+		FROM View_Goods_Rent_More
+	</sql>
+	<!-- 增加一条用户数据 -->
+	<insert id="insert" parameterType="com.zhz233.bs.model.TGoodsRentModel">
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+			insert 
+			into Tab_Goods_Rent(goods_no,goods_game_no,
+			goods_hour,goods_night,goods_day,
+			goods_week,goods_month,goods_year,goods_access,
+			goods_password,goods_logon_style,goods_compensate,goods_beforehand,
+			goods_delay,goods_short_time,goods_credit_level,goods_view_count,
+			goods_rent_count,goods_recomm_count,goods_complaint_count)
+			values(#{goods_no},#{goods_game_no},
+			#{goods_hour},#{goods_night},#{goods_day},
+			#{goods_week},#{goods_month},#{goods_year},#{goods_access},
+			#{goods_password},#{goods_logon_style},#{goods_compensate},#{goods_beforehand},
+			#{goods_delay},#{goods_short_time},#{goods_credit_level},#{goods_view_count},
+			#{goods_rent_count},#{goods_recomm_count},#{goods_complaint_count})
+	</insert>
+	<!-- 删除一条用户数据 -->
+	<delete id="delete" parameterType="com.zhz233.bs.model.TGoodsRentModel">
+		DELETE FROM Tab_Goods_Rent
+	    <where>
+	    	<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	    </where>
+	</delete>
+	<!-- 返回所有数据 -->
+	<select id="select" parameterType="com.zhz233.bs.model.TGoodsRentModel" resultType="com.zhz233.bs.model.TGoodsRentModel">
+		<include refid="selectAuto"/>
+	</select>
+	<!-- selectInfo -->
+	<select id="selectTByNo" parameterType="com.zhz233.bs.model.TGoodsRentModel" resultMap="VGoodsMore">
+		<include refid="selectInfo"/>
+		<where>
+			<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	    </where>
+	</select>
+	<!-- 精确 条件查询 返回一条数据 -->
+	<select id="selectT" parameterType="com.zhz233.bs.model.TGoodsRentModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	        <if test="goods_game_no != null">
+	            and goods_game_no = #{goods_game_no}
+	        </if>
+	        <if test="goods_hour != null">
+	            and goods_hour = #{goods_hour}
+	        </if>
+	        <if test="goods_night != null">
+	            and goods_night = #{goods_night}
+	        </if>
+	         <if test="goods_day != null">
+	            and goods_day = #{goods_day}
+	        </if>
+	        <if test="goods_week != null">
+	            and goods_week = #{goods_week}
+	        </if>
+	        <if test="goods_month != null">
+	            and goods_month = #{goods_month}
+	        </if>
+	        <if test="goods_year != null">
+	            and goods_year = #{goods_year}
+	        </if>
+	        <if test="goods_access != null">
+	            and goods_access = #{goods_access}
+	        </if>
+	        <if test="goods_password != null">
+	            and goods_password = #{goods_password}
+	        </if>
+	        <if test="goods_logon_style != null">
+	            and goods_logon_style = #{goods_logon_style}
+	        </if>
+	        <if test="goods_compensate != null">
+	            and goods_compensate = #{goods_compensate}
+	        </if>
+	        <if test="goods_beforehand != null">
+	            and goods_beforehand = #{goods_beforehand}
+	        </if>
+	        <if test="goods_delay != null">
+	            and goods_delay = #{goods_delay}
+	        </if>
+	        <if test="goods_short_time != null">
+	            and goods_short_time = #{goods_short_time}
+	        </if>
+	        <if test="goods_credit_level != null">
+	            and goods_credit_level = #{goods_credit_level}
+	        </if>
+	        <if test="goods_view_count != null">
+	            and goods_view_count = #{goods_view_count}
+	        </if>
+	        <if test="goods_rent_count != null">
+	            and goods_rent_count = #{goods_rent_count}
+	        </if>
+	        <if test="goods_recomm_count != null">
+	            and goods_recomm_count = #{goods_recomm_count}
+	        </if>
+	        <if test="goods_complaint_count != null">
+	            and goods_complaint_count = #{goods_complaint_count}
+	        </if>
+	    </where>
+	</select>
+	<!-- 精确 条件查询 返回数据集合 -->
+	<select id="selectListT" parameterType="com.zhz233.bs.model.TGoodsRentModel">
+		<include refid="selectAuto"/>
+		<where>
+			<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	        <if test="goods_game_no != null">
+	            and goods_game_no = #{goods_game_no}
+	        </if>
+	        <if test="goods_hour != null">
+	            and goods_hour = #{goods_hour}
+	        </if>
+	        <if test="goods_night != null">
+	            and goods_night = #{goods_night}
+	        </if>
+	         <if test="goods_day != null">
+	            and goods_day = #{goods_day}
+	        </if>
+	        <if test="goods_week != null">
+	            and goods_week = #{goods_week}
+	        </if>
+	        <if test="goods_month != null">
+	            and goods_month = #{goods_month}
+	        </if>
+	        <if test="goods_year != null">
+	            and goods_year = #{goods_year}
+	        </if>
+	        <if test="goods_access != null">
+	            and goods_access = #{goods_access}
+	        </if>
+	        <if test="goods_password != null">
+	            and goods_password = #{goods_password}
+	        </if>
+	        <if test="goods_logon_style != null">
+	            and goods_logon_style = #{goods_logon_style}
+	        </if>
+	        <if test="goods_compensate != null">
+	            and goods_compensate = #{goods_compensate}
+	        </if>
+	        <if test="goods_beforehand != null">
+	            and goods_beforehand = #{goods_beforehand}
+	        </if>
+	        <if test="goods_delay != null">
+	            and goods_delay = #{goods_delay}
+	        </if>
+	        <if test="goods_short_time != null">
+	            and goods_short_time = #{goods_short_time}
+	        </if>
+	        <if test="goods_credit_level != null">
+	            and goods_credit_level = #{goods_credit_level}
+	        </if>
+	        <if test="goods_view_count != null">
+	            and goods_view_count = #{goods_view_count}
+	        </if>
+	        <if test="goods_rent_count != null">
+	            and goods_rent_count = #{goods_rent_count}
+	        </if>
+	        <if test="goods_recomm_count != null">
+	            and goods_recomm_count = #{goods_recomm_count}
+	        </if>
+	        <if test="goods_complaint_count != null">
+	            and goods_complaint_count = #{goods_complaint_count}
+	        </if>
+	    </where>
+	</select>
+	<!-- update 更新一条数据 -->
+	<update id="update" parameterType="com.zhz233.bs.model.TGoodsRentModel">
+	    UPDATE Tab_Goods_Rent
+	    <set>
+	        <if test="goods_no != null">
+	            goods_no = #{goods_no}
+	        </if>
+	        <if test="goods_game_no != null">
+	            goods_game_no = #{goods_game_no}
+	        </if>
+	        <if test="goods_hour != null">
+	            goods_hour = #{goods_hour}
+	        </if>
+	        <if test="goods_night != null">
+	            goods_night = #{goods_night}
+	        </if>
+	         <if test="goods_day != null">
+	            goods_day = #{goods_day}
+	        </if>
+	        <if test="goods_week != null">
+	            goods_week = #{goods_week}
+	        </if>
+	        <if test="goods_month != null">
+	            goods_month = #{goods_month}
+	        </if>
+	        <if test="goods_year != null">
+	            goods_year = #{goods_year}
+	        </if>
+	        <if test="goods_access != null">
+	            goods_access = #{goods_access}
+	        </if>
+	        <if test="goods_password != null">
+	            goods_password = #{goods_password}
+	        </if>
+	        <if test="goods_logon_style != null">
+	            goods_logon_style = #{goods_logon_style}
+	        </if>
+	        <if test="goods_compensate != null">
+	            goods_compensate = #{goods_compensate}
+	        </if>
+	        <if test="goods_beforehand != null">
+	            goods_beforehand = #{goods_beforehand}
+	        </if>
+	        <if test="goods_delay != null">
+	            goods_delay = #{goods_delay}
+	        </if>
+	        <if test="goods_short_time != null">
+	            goods_short_time = #{goods_short_time}
+	        </if>
+	        <if test="goods_credit_level != null">
+	            goods_credit_level = #{goods_credit_level}
+	        </if>
+	        <if test="goods_view_count != null">
+	            goods_view_count = #{goods_view_count}
+	        </if>
+	        <if test="goods_rent_count != null">
+	            goods_rent_count = #{goods_rent_count}
+	        </if>
+	        <if test="goods_recomm_count != null">
+	            goods_recomm_count = #{goods_recomm_count}
+	        </if>
+	        <if test="goods_complaint_count != null">
+	            goods_complaint_count = #{goods_complaint_count}
+	        </if>
+	    </set>
+	    <where>
+	    	<if test="goods_no != null">
+	            and goods_no = #{goods_no}
+	        </if>
+	    </where>
+	</update>
+</mapper>	

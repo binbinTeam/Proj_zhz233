@@ -1,0 +1,93 @@
+/**
+* Copyright © 2018 ZhzTeam Info. All rights reserved.
+*  
+* @Title: CorsFilter.java 
+* @Package com.zhz233.bs.filter 
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月18日
+* @version V1.0.0
+*/
+package com.zhz233.bs.filter;
+
+import java.io.IOException;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.zhz233.bs.model.JWTModel;
+import com.zhz233.bs.result.JWTResult;
+import com.zhz233.comn.utils.GsonUtils;
+import com.zhz233.comn.utils.JWTUtils;
+
+/**
+* @ClassName: CorsFilter
+* @Description: TODO 
+* @author ZhzTeam
+* @date 2018年3月18日
+*/
+public class LoginFilter implements Filter{
+
+	/* (no-Javadoc)
+	* <p>Title: init</p>
+	* <p>Description: 初始化 Filter</p>
+	* @param filterConfig
+	* @throws ServletException
+	* @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+	*/ 
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+		// TODO Auto-generated method stub
+	}
+	/* (no-Javadoc)
+	* <p>Title: doFilter</p>
+	* <p>Description: </p>
+	* @param request
+	* @param response
+	* @param chain
+	* @throws IOException
+	* @throws ServletException
+	* @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
+	*/ 
+	@Override
+	public void doFilter(ServletRequest request, 
+			ServletResponse response, 
+			FilterChain chain)
+			throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		//获取request response session
+		HttpServletRequest hsRequest = (HttpServletRequest) request;
+		HttpServletResponse hsResponse = (HttpServletResponse) response;
+		//判断界面
+		String servletPath = hsRequest.getServletPath();
+		//token
+		String tokenStr = hsRequest.getHeader("token");
+		//重定向至 home 界面
+		/*if(servletPath.equals("")
+				|| servletPath.equals("")
+				) {
+			
+		}*/	
+		//通过
+		chain.doFilter(request, response);
+	}
+
+	/* (no-Javadoc)
+	* <p>Title: destroy</p>
+	* <p>Description: 销毁 Filter</p>
+	* @see javax.servlet.Filter#destroy()
+	*/ 
+	@Override
+	public void destroy() {
+		// TODO Auto-generated method stub
+		Filter.super.destroy();
+	}
+
+}
